@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { NavLink } from "@/app/NavLink";
 import { redirect } from "next/navigation";
 import { signOut } from "@/app/login/actions";
 import { getOwner } from "@/lib/supabase-server";
@@ -12,9 +12,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <>
       <header className={styles.nav}>
-        <Link href="/admin">ניהול</Link>
-        <Link href="/admin/posts">פוסטים</Link>
-        <Link href="/admin/reports">דוח שימוש</Link>
+        <NavLink href="/admin" exact>ניהול</NavLink>
+        <NavLink href="/admin/posts">פוסטים</NavLink>
+        <NavLink href="/admin/reports">דוח שימוש</NavLink>
         <form action={signOut}>
           <button type="submit">יציאה</button>
         </form>
