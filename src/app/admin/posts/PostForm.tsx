@@ -50,7 +50,7 @@ export function PostForm({
           <input id="daf" name="daf" type="text" inputMode="text" placeholder="לדוגמה: ב או 2" defaultValue={formatDaf(values.daf)} required />
         </div>
         <div className={styles.field}>
-          <label htmlFor="title">כותרת</label>
+          <label htmlFor="title">כותרת (עד 200 תווים)</label>
           <input id="title" name="title" maxLength={200} defaultValue={values.title} required />
         </div>
         <div className={styles.field}>
@@ -58,7 +58,7 @@ export function PostForm({
           <input id="summary" name="summary" maxLength={500} defaultValue={values.summary} />
         </div>
         <div className={styles.field}>
-          <label htmlFor="body">גוף הפוסט (שורה ריקה בין פסקאות)</label>
+          <label htmlFor="body">גוף הפוסט (עד 60,000 תווים, שורה ריקה בין פסקאות)</label>
           <textarea id="body" name="body" defaultValue={values.body} required />
         </div>
         <div className={styles.actions}>
