@@ -392,3 +392,35 @@ a:hover {
   min-height: 44px;
   text-decoration: none;
 }
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 20px;
+}
+
+.tags .chip {
+  text-decoration: none;
+}
+
+.archive-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  font-size: 14px;
+}
+
+.empty {
+  padding: 24px 16px;
+  text-align: center;
+  background: var(--tint);
+  border-radius: 14px;
+}
+
+@media (min-width: 900px) {
+  .archive-list {
+    gap: 12px;
+  }
+}
