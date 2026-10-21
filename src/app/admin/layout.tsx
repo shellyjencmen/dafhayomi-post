@@ -14,6 +14,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <header className={styles.nav}>
         <NavLink href="/admin" exact>ניהול</NavLink>
         <NavLink href="/admin/posts">פוסטים</NavLink>
+        <NavLink href="/admin/comments">תגובות</NavLink>
         <NavLink href="/admin/reports">דוח שימוש</NavLink>
         <form action={signOut}>
           <button type="submit">יציאה</button>
