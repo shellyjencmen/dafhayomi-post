@@ -1,0 +1,77 @@
+:root {
+  --ground: #f5f7fa;
+  --ink: #14202b;
+  --muted: #4a5a68;
+  --accent: #1e4d6b;
+  --line: #d9e0e7;
+}
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: system-ui, "Segoe UI", Arial, sans-serif;
+  line-height: 1.8;
+}
+
+a {
+  color: var(--accent);
+}
+
+.site-header {
+  background: var(--ink);
+  color: #fff;
+  padding: 16px;
+}
+
+.site-header a {
+  color: #fff;
+  font-size: 24px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.post-title {
+  font-size: 32px;
+  line-height: 1.25;
+  margin: 8px 0;
+}
+
+.post-body p {
+  font-size: 18px;
+  margin: 0 0 16px;
+}
+
+.gemara-page {
+  margin: 16px 0;
+}
+
+.gemara-page img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+}
+
+.button-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 20px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 8px;
+  font-weight: 700;
+  text-decoration: none;
+}
