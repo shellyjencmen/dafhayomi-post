@@ -52,7 +52,9 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
   ]);
   const byId = new Map((versions ?? []).map((v: { id: string; title: string; body: string }) => [v.id, v]));
   const main = byId.get(latest.current_version_id);
-  const intro = main ? paragraphsOf(main.body).slice(0, 2) : [];
+  const allParagraphs = main ? paragraphsOf(main.body) : [];
+  const intro = allParagraphs.slice(0, 2);
+  const truncated = allParagraphs.length > intro.length;
   const imageBase = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${GEMARA_BUCKET}`;
   const gemara = (pages ?? []) as GemaraRow[];
 
@@ -77,7 +79,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
               </span>
             </span>
           </div>
-          <div className="post-body fade">
+          <div className={truncated ? "post-body fade" : "post-body"}>
             {intro.map((text, i) => (
               <p key={i}>{text}</p>
             ))}
