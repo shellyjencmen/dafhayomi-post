@@ -490,3 +490,16 @@ a:hover {
   height: 1px;
   overflow: hidden;
 }
+
+.state {
+  text-align: center;
+  padding-top: 48px;
+}
+
+.state-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+}
