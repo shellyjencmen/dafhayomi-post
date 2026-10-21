@@ -4,13 +4,15 @@
   gap: 16px;
   align-items: center;
   padding: 12px 16px;
-  background: #14202b;
-  color: #fff;
+  background: #fff;
+  border-bottom: 1px solid #e7e0d4;
+  color: #1c1b19;
 }
 
 .nav a,
 .nav button {
-  color: #fff;
+  color: #6b6459;
+  border-bottom: 2px solid transparent;
   font-size: 16px;
   min-height: 44px;
   display: inline-flex;
@@ -19,6 +21,12 @@
   border: 0;
   cursor: pointer;
   text-decoration: none;
+}
+
+.nav a[aria-current="page"] {
+  color: #1c1b19;
+  font-weight: 700;
+  border-bottom-color: #a87b2a;
 }
 
 .page {
@@ -52,15 +60,15 @@
   align-items: center;
   padding: 0 16px;
   background: #fff;
-  border: 1px solid #d9e0e7;
-  border-radius: 8px;
-  color: #14202b;
+  border: 1px solid #e7e0d4;
+  border-radius: 12px;
+  color: #1c1b19;
   text-decoration: none;
 }
 
 .state {
   font-size: 14px;
-  color: #4a5a68;
+  color: #6b6459;
   font-weight: 700;
 }
 
@@ -73,7 +81,7 @@
 
 .field label {
   font-size: 14px;
-  color: #4a5a68;
+  color: #6b6459;
 }
 
 .field input,
@@ -83,7 +91,7 @@
   font-size: 16px;
   min-height: 48px;
   padding: 8px 12px;
-  border: 1px solid #9aa8b5;
+  border: 1px solid #cfc6b4;
   border-radius: 8px;
   box-sizing: border-box;
   width: 100%;
@@ -128,7 +136,7 @@
 .message {
   padding: 12px 16px;
   border-radius: 8px;
-  background: #e6ebf0;
+  background: #f4ecdd;
   margin-bottom: 16px;
 }
 
