@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { publicClient } from "@/lib/supabase";
+import { recordView } from "@/lib/views";
 
 export const dynamic = "force-dynamic";
 
@@ -43,10 +44,17 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return { title: found.version.title, description: found.version.summary ?? undefined };
 }
 
-export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function PostPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ src?: string | string[] }>;
+}) {
   const found = await loadPost((await params).slug);
   if (!found) notFound();
   const { post, version, pages } = found;
+  await recordView(post.id, (await searchParams).src);
   const masechet = masechetName(post);
   const paragraphs: string[] = String(version.body).split(/\n{2,}/).filter((p) => p.trim());
   const imageBase = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${GEMARA_BUCKET}`;
