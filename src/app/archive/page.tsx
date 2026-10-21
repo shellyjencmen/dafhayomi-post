@@ -31,10 +31,11 @@ export default async function ArchivePage({ searchParams }: { searchParams: Prom
     .order("published_on", { ascending: false, nullsFirst: false });
   if (Number.isInteger(masechetId) && masechetId > 0) query = query.eq("masechet_id", masechetId);
 
-  const [{ data: posts }, { data: masechtot }] = await Promise.all([
+  const [{ data: posts, error: postsError }, { data: masechtot }] = await Promise.all([
     query,
     db.from("masechtot").select("id, name").order("sort_order"),
   ]);
+  if (postsError) console.error("archive: posts query failed", postsError);
   const rows = (posts ?? []) as PostRow[];
 
   const { data: versions } = rows.length
@@ -62,7 +63,9 @@ export default async function ArchivePage({ searchParams }: { searchParams: Prom
         </button>
         {masechet ? <Link href="/archive">ניקוי הסינון</Link> : null}
       </form>
-      {rows.length === 0 ? (
+      {postsError ? (
+        <p role="alert">טעינת הפוסטים נכשלה. נסי לרענן, ואם זה חוזר יש לפנות אליי.</p>
+      ) : rows.length === 0 ? (
         <p>לא נמצאו פוסטים.</p>
       ) : (
         <ul className="archive-list">
