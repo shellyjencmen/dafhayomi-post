@@ -7,6 +7,7 @@ import { formatDaf } from "@/lib/daf";
 import { masechetName, formatPublishedOn, paragraphsOf, readingMinutes } from "@/lib/posts";
 import { publicClient } from "@/lib/supabase";
 import { recordView } from "@/lib/views";
+import { Comments } from "./Comments";
 
 export const dynamic = "force-dynamic";
 
@@ -36,7 +37,13 @@ async function loadPost(slug: string) {
     loadPrevious(post.published_on, post.id),
   ]);
   if (!version) return null;
-  return { post, version, pages: pages ?? [], previous };
+  const { data: comments } = await db
+    .from("comments")
+    .select("id, author_name, body, created_at")
+    .eq("post_id", post.id)
+    .eq("status", "approved")
+    .order("created_at");
+  return { post, version, pages: pages ?? [], previous, comments: comments ?? [] };
 }
 
 async function loadPrevious(publishedOn: string | null, postId: string) {
@@ -68,13 +75,15 @@ export default async function PostPage({
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ src?: string | string[] }>;
+  searchParams: Promise<{ src?: string | string[]; sent?: string; cerror?: string }>;
 }) {
   const { slug } = await params;
   const found = await loadPost(slug);
   if (!found) notFound();
-  const { post, version, pages, previous } = found;
-  await recordView(post.id, (await searchParams).src);
+  const { post, version, pages, previous, comments } = found;
+  const query = await searchParams;
+  // The redirect after sending a comment is not a new visit.
+  if (!query.sent && !query.cerror) await recordView(post.id, query.src);
   const masechet = masechetName(post.masechtot);
   const paragraphs = paragraphsOf(version.body);
   const imageBase = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${GEMARA_BUCKET}`;
@@ -129,6 +138,7 @@ export default async function PostPage({
               <span className="card-title">{previous.title}</span>
             </Link>
           ) : null}
+          <Comments slug={post.slug} comments={comments} sent={query.sent === "1"} error={query.cerror} />
         </article>
         {images.length ? (
           <aside className="home-side">

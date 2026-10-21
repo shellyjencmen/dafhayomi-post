@@ -12,10 +12,12 @@ type Post = { id: string; slug: string; daf: number | null; masechtot: { name: s
 export default async function ReportsPage() {
   // Layout already requires an owner; page_views has no public policies, so read it with the server key.
   const db = adminClient();
-  const [{ data: views, error }, { data: posts }] = await Promise.all([
+  const [{ data: views, error }, { data: posts }, { data: commentRows }] = await Promise.all([
     db.from("page_views").select("post_id, channel"),
     db.from("posts").select("id, slug, daf, masechtot(name)"),
+    db.from("comments").select("status"),
   ]);
+  const commentCount = (status: string) => (commentRows ?? []).filter((c: { status: string }) => c.status === status).length;
   const rows = (views ?? []) as View[];
   const byPost = new Map<string, Map<string, number>>();
   const byChannel = new Map<string, number>();
@@ -39,6 +41,10 @@ export default async function ReportsPage() {
       <h1>דוח שימוש</h1>
       {error && <p className={styles.error} role="alert">טעינת הנתונים נכשלה.</p>}
       <p className={styles.message}>כניסות מצטברות לפי פוסט וערוץ. לא נשמרים עוגיות או פרטים מזהים, וכניסות שלך ושל בוטים לא נספרות.</p>
+      <h2>תגובות</h2>
+      <p>
+        פורסמו: <strong>{commentCount("approved")}</strong> · ממתינות לאישור: <strong>{commentCount("pending")}</strong>
+      </p>
       <h2>לפי ערוץ</h2>
       <ul className={styles.list}>
         {[...byChannel.entries()].sort((a, b) => b[1] - a[1]).map(([channel, count]) => (
