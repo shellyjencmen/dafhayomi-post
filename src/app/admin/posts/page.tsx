@@ -1,3 +1,4 @@
+import { formatDaf } from "@/lib/daf";
 import Link from "next/link";
 import { sessionClient } from "@/lib/supabase-server";
 import styles from "../admin.module.css";
@@ -38,7 +39,7 @@ export default async function PostsPage() {
             return (
               <li key={p.id}>
                 <Link href={`/admin/posts/${p.id}`}>
-                  <span>{m ? `מסכת ${m.name}, דף ${p.daf}` : "ללא מסכת"}</span>
+                  <span>{m ? `מסכת ${m.name}, דף ${formatDaf(p.daf)}` : "ללא מסכת"}</span>
                   <span className={styles.state}>{STATE_LABEL[p.publish_state] ?? p.publish_state}</span>
                 </Link>
               </li>

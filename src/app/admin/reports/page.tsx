@@ -1,3 +1,4 @@
+import { formatDaf } from "@/lib/daf";
 import { adminClient } from "@/lib/supabase";
 import styles from "../admin.module.css";
 
@@ -26,7 +27,7 @@ export default async function ReportsPage() {
   }
   const label = (p: Post) => {
     const m = Array.isArray(p.masechtot) ? p.masechtot[0] : p.masechtot;
-    return m ? `מסכת ${m.name}, דף ${p.daf}` : p.slug;
+    return m ? `מסכת ${m.name}, דף ${formatDaf(p.daf)}` : p.slug;
   };
   const postRows = ((posts ?? []) as Post[])
     .map((p) => ({ p, total: [...(byPost.get(p.id)?.values() ?? [])].reduce((a, b) => a + b, 0) }))

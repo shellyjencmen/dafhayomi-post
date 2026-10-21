@@ -1,5 +1,6 @@
 "use server";
 
+import { parseDaf } from "@/lib/daf";
 import { redirect } from "next/navigation";
 import { sessionClient, getOwner } from "@/lib/supabase-server";
 
@@ -22,12 +23,12 @@ function back(id: string | null, key: "error" | "msg", text: string): never {
 
 function readFields(formData: FormData, id: string | null): Fields {
   const masechetId = Number(formData.get("masechet_id"));
-  const daf = Number(formData.get("daf"));
+  const daf = parseDaf(String(formData.get("daf") ?? ""));
   const title = String(formData.get("title") ?? "").trim();
   const body = String(formData.get("body") ?? "");
   const summary = String(formData.get("summary") ?? "").trim() || null;
   if (!Number.isInteger(masechetId) || masechetId < 1) back(id, "error", "יש לבחור מסכת.");
-  if (!Number.isInteger(daf) || daf < 1) back(id, "error", "יש להזין מספר דף.");
+  if (daf === null) back(id, "error", "יש להזין דף באותיות או במספר, לדוגמה ב או 2.");
   if (!title) back(id, "error", "יש להזין כותרת.");
   if (title.length > MAX_TITLE) back(id, "error", `הכותרת ארוכה מדי (עד ${MAX_TITLE} תווים).`);
   if (!body.trim()) back(id, "error", "יש להזין את גוף הפוסט.");
