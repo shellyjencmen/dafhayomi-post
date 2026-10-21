@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { sessionClient } from "@/lib/supabase-server";
 import { PostForm } from "../PostForm";
+import { GemaraUploader } from "./GemaraUploader";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +29,20 @@ export default async function EditPostPage({
     .limit(1)
     .maybeSingle();
   const { data: masechtot } = await supabase.from("masechtot").select("id, name").order("sort_order");
+  const { data: pages } = await supabase
+    .from("gemara_pages")
+    .select("id, label, alt_text, image_path")
+    .eq("post_id", id)
+    .order("sort");
+  const imageBase = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/gemara`;
+  const images = (pages ?? []).map((p: { id: string; label: string | null; alt_text: string | null; image_path: string }) => ({
+    id: p.id,
+    url: `${imageBase}/${p.image_path}`,
+    label: p.label,
+    alt: p.alt_text,
+  }));
   return (
+    <>
     <PostForm
       values={{
         id: post.id,
@@ -44,5 +58,9 @@ export default async function EditPostPage({
       message={msg}
       error={error}
     />
+    <div style={{ maxWidth: 720, margin: "0 auto", padding: "0 16px 48px" }}>
+      <GemaraUploader postId={post.id} images={images} />
+    </div>
+    </>
   );
 }
