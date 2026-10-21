@@ -56,7 +56,7 @@ export default async function PostsPage() {
       <div className={styles.split}>
         <section>
           {rows.length === 0 ? (
-            <p>אין עדיין פוסטים. לחצי על "פוסט חדש" כדי להתחיל.</p>
+            <p>אין עדיין פוסטים. לחצי על פוסט חדש כדי להתחיל.</p>
           ) : (
             <table className={styles.table}>
               <thead>
