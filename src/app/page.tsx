@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { GemaraViewer } from "./GemaraViewer";
 import { formatDaf } from "@/lib/daf";
 import { masechetName, paragraphsOf, readingMinutes, formatPublishedOn } from "@/lib/posts";
 import { publicClient } from "@/lib/supabase";
@@ -90,17 +91,14 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
         </section>
         {gemara.length ? (
           <aside className="home-side">
-            <div className="side-title">
-              <strong>דף הגמרא לעיון</strong>
-              <span className="muted">רפרנס לטקסט</span>
-            </div>
-            {gemara.map((page) => (
-              <figure key={page.id} className="gemara-page">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={`${imageBase}/${page.image_path}`} alt={page.alt_text ?? page.label ?? "דף גמרא"} />
-                {page.label ? <figcaption className="muted">{page.label}</figcaption> : null}
-              </figure>
-            ))}
+            <GemaraViewer
+              images={gemara.map((page) => ({
+                id: page.id,
+                url: `${imageBase}/${page.image_path}`,
+                label: page.label,
+                alt: page.alt_text,
+              }))}
+            />
           </aside>
         ) : null}
       </div>
