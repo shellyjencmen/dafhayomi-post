@@ -16,6 +16,12 @@ export default async function PreviewPage({ params }: { params: Promise<{ id: st
     .limit(1)
     .maybeSingle();
   if (!latest) notFound();
+  const { data: pages } = await supabase
+    .from("gemara_pages")
+    .select("id, label, alt_text, image_path")
+    .eq("post_id", id)
+    .order("sort");
+  const imageBase = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/gemara`;
   const paragraphs: string[] = String(latest.body).split(/\n{2,}/).filter((p) => p.trim());
   return (
     <main className={`${styles.page} ${styles.preview}`}>
@@ -23,6 +29,13 @@ export default async function PreviewPage({ params }: { params: Promise<{ id: st
       <h1>{latest.title}</h1>
       {paragraphs.map((text, i) => (
         <p key={i}>{text}</p>
+      ))}
+      {(pages ?? []).map((page: { id: string; label: string | null; alt_text: string | null; image_path: string }) => (
+        <figure key={page.id}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={`${imageBase}/${page.image_path}`} alt={page.alt_text ?? page.label ?? "דף גמרא"} style={{ maxWidth: "100%", height: "auto" }} />
+          {page.label ? <figcaption>{page.label}</figcaption> : null}
+        </figure>
       ))}
       <Link className={styles.secondary} href={`/admin/posts/${id}`}>
         חזרה לעריכה

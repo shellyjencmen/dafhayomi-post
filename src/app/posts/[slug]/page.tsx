@@ -1,3 +1,4 @@
+import { formatDaf } from "@/lib/daf";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { publicClient } from "@/lib/supabase";
@@ -61,7 +62,7 @@ export default async function PostPage({
 
   return (
     <main className="page">
-      <p className="muted">{masechet ? `מסכת ${masechet}, דף ${post.daf}` : ""}</p>
+      <p className="muted">{masechet ? `מסכת ${masechet}, דף ${formatDaf(post.daf)}` : ""}</p>
       <h1 className="post-title">{version.title}</h1>
       <article className="post-body">
         {paragraphs.map((text, i) => (

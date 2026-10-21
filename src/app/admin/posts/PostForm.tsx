@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { publish, saveDraft, unpublish } from "./actions";
+import { formatDaf } from "@/lib/daf";
 import styles from "../admin.module.css";
 
 export type FormValues = {
@@ -46,7 +47,7 @@ export function PostForm({
         </div>
         <div className={styles.field}>
           <label htmlFor="daf">דף</label>
-          <input id="daf" name="daf" type="number" min={1} defaultValue={values.daf ?? ""} required />
+          <input id="daf" name="daf" type="text" inputMode="text" placeholder="לדוגמה: ב או 2" defaultValue={formatDaf(values.daf)} required />
         </div>
         <div className={styles.field}>
           <label htmlFor="title">כותרת</label>

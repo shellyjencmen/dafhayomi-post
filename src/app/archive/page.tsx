@@ -1,3 +1,4 @@
+import { formatDaf } from "@/lib/daf";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { publicClient } from "@/lib/supabase";
@@ -73,7 +74,7 @@ export default async function ArchivePage({ searchParams }: { searchParams: Prom
             <li key={p.slug}>
               <Link href={`/posts/${p.slug}`}>
                 <strong>
-                  {masechetName(p.masechtot) ? `מסכת ${masechetName(p.masechtot)}, דף ${p.daf}` : p.slug}
+                  {masechetName(p.masechtot) ? `מסכת ${masechetName(p.masechtot)}, דף ${formatDaf(p.daf)}` : p.slug}
                 </strong>
                 <span className="muted">{titles.get(p.current_version_id)}</span>
               </Link>
