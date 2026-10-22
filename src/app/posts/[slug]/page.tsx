@@ -6,6 +6,7 @@ import { GemaraViewer } from "@/app/GemaraViewer";
 import { formatDaf } from "@/lib/daf";
 import { masechetName, formatPublishedOn, paragraphsOf, readingMinutes } from "@/lib/posts";
 import { publicClient } from "@/lib/supabase";
+import { RichParagraph } from "@/lib/RichText";
 import { recordView } from "@/lib/views";
 
 export const dynamic = "force-dynamic";
@@ -115,7 +116,7 @@ export default async function PostPage({
           </div>
           <div className="post-body">
             {paragraphs.map((text, i) => (
-              <p key={i}>{text}</p>
+              <RichParagraph key={i} text={text} />
             ))}
           </div>
           <a className="button-link wide outline" href={`https://wa.me/?text=${shareText}`} target="_blank" rel="noreferrer">
