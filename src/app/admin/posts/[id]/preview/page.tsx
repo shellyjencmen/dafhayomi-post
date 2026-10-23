@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { RichParagraph } from "@/lib/RichText";
 import { sessionClient } from "@/lib/supabase-server";
 import styles from "../../../admin.module.css";
 
@@ -28,7 +29,7 @@ export default async function PreviewPage({ params }: { params: Promise<{ id: st
       <p className={styles.message}>תצוגה מקדימה של הגרסה האחרונה שנשמרה. הקוראים רואים רק פוסט שפורסם.</p>
       <h1>{latest.title}</h1>
       {paragraphs.map((text, i) => (
-        <p key={i}>{text}</p>
+        <RichParagraph key={i} text={text} />
       ))}
       {(pages ?? []).map((page: { id: string; label: string | null; alt_text: string | null; image_path: string }) => (
         <figure key={page.id}>

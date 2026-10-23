@@ -107,6 +107,11 @@ a:hover {
   margin: 8px 0;
 }
 
+.post-body a {
+  color: var(--accent, inherit);
+  text-decoration: underline;
+}
+
 .post-body p {
   font-family: var(--serif);
   font-size: 22px;

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { GemaraViewer } from "./GemaraViewer";
 import { formatDaf } from "@/lib/daf";
 import { masechetName, paragraphsOf, readingMinutes, formatPublishedOn } from "@/lib/posts";
+import { RichParagraph } from "@/lib/RichText";
 import { publicClient } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
@@ -82,7 +83,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
           </div>
           <div className={truncated ? "post-body fade" : "post-body"}>
             {intro.map((text, i) => (
-              <p key={i}>{text}</p>
+              <RichParagraph key={i} text={text} />
             ))}
           </div>
           <Link className="button-link wide" href={`/posts/${latest.slug}${channel}`}>
