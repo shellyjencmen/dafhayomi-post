@@ -19,7 +19,8 @@ type Row = {
 };
 type Version = { id: string; post_id: string; version_no: number; title: string };
 
-export default async function PostsPage() {
+export default async function PostsPage({ searchParams }: { searchParams: Promise<{ msg?: string }> }) {
+  const { msg } = await searchParams;
   const supabase = await sessionClient();
   const [{ data }, { data: versionRows }, { data: viewRows }] = await Promise.all([
     supabase.from("posts").select("id, daf, publish_state, current_version_id, masechtot(name)").order("updated_at", { ascending: false }),
@@ -53,6 +54,7 @@ export default async function PostsPage() {
           פוסט חדש
         </Link>
       </div>
+      {msg && <p className={styles.message} role="status">{msg}</p>}
       <div className={styles.split}>
         <section>
           {rows.length === 0 ? (

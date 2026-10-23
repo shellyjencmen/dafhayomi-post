@@ -85,6 +85,11 @@ export function PostForm({
           <button className={styles.secondary}>הסרה מהאתר</button>
         </form>
       )}
+      {id && (
+        <p>
+          <Link href={`/admin/posts/${id}/delete`}>מחיקת הפוסט</Link>
+        </p>
+      )}
     </main>
   );
 }

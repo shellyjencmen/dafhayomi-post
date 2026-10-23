@@ -2,6 +2,8 @@
 
 import { parseDaf } from "@/lib/daf";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
+import { adminClient } from "@/lib/supabase";
 import { sessionClient, getOwner } from "@/lib/supabase-server";
 
 const MAX_TITLE = 200;
@@ -121,4 +123,21 @@ export async function unpublish(id: string) {
   const supabase = await sessionClient();
   await supabase.from("posts").update({ publish_state: "unpublished" }).eq("id", id);
   redirect(`/admin/posts/${id}?msg=${encodeURIComponent("הפוסט הוסר מהאתר. הגרסאות נשמרו.")}`);
+}
+
+/** Permanent delete: versions, Gemara pages, comments and views go with the post row (on delete cascade). */
+export async function deletePost(id: string) {
+  if (!(await getOwner())) redirect("/login");
+  const db = adminClient();
+  const { data: pages } = await db.from("gemara_pages").select("image_path, original_path").eq("post_id", id);
+  const { error } = await db.from("posts").delete().eq("id", id);
+  if (error) redirect(`/admin/posts/${id}/delete?error=${encodeURIComponent("המחיקה נכשלה. נסי שוב.")}`);
+  const publicPaths = (pages ?? []).map((p: { image_path: string }) => p.image_path);
+  const originalPaths = (pages ?? []).map((p: { original_path: string | null }) => p.original_path).filter((p): p is string => !!p);
+  if (publicPaths.length) await db.storage.from("gemara").remove(publicPaths);
+  if (originalPaths.length) await db.storage.from("gemara-originals").remove(originalPaths);
+  revalidatePath("/");
+  revalidatePath("/archive");
+  revalidatePath("/admin/posts");
+  redirect(`/admin/posts?msg=${encodeURIComponent("הפוסט נמחק.")}`);
 }
