@@ -47,20 +47,20 @@ export default async function CommentsPage() {
   return (
     <main className={styles.page}>
       <h1>תגובות</h1>
-      <p className={styles.message}>תגובה מופיעה באתר רק אחרי שאישרת אותה.</p>
+      <p className={styles.message}>תגובות מתפרסמות מיד. אפשר להסיר תגובה מהאתר.</p>
       {error && <p className={styles.error} role="alert">טעינת התגובות נכשלה.</p>}
-      <h2>ממתינות לאישור ({pending.length})</h2>
-      {pending.length === 0 ? (
-        <p>אין תגובות שממתינות.</p>
-      ) : (
-        <ul className={styles.list}>
-          {pending.map((c) =>
-            item(c, [
-              { label: "אישור ופרסום", status: "approved", primary: true },
-              { label: "דחייה", status: "rejected" },
-            ]),
-          )}
-        </ul>
+      {pending.length > 0 && (
+        <>
+          <h2>ממתינות לאישור ({pending.length})</h2>
+          <ul className={styles.list}>
+            {pending.map((c) =>
+              item(c, [
+                { label: "אישור ופרסום", status: "approved", primary: true },
+                { label: "דחייה", status: "rejected" },
+              ]),
+            )}
+          </ul>
+        </>
       )}
       <h2>פורסמו ({approved.length})</h2>
       {approved.length === 0 ? (
