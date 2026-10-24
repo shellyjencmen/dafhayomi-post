@@ -27,7 +27,7 @@ export function Comments({
       </ul>
       {sent ? (
         <p className="notice" role="status">
-          תודה! התגובה נשלחה ותופיע באתר אחרי שאבי יאשר אותה.
+          תודה! התגובה פורסמה.
         </p>
       ) : null}
       {error ? (
