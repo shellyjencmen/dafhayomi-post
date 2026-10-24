@@ -9,9 +9,9 @@ Weekly Daf Yomi post site for Avi Yunitzman: public site for the post and Gemara
 - install: npm install
 - run locally: npm run dev
 - test: npm run lint && npm run build
-- deploy: merge to main (Vercel production)
+- deploy: PR into `test` (test environment), and after approval a PR from `test` into `main` (Vercel production)
 ## Rules
-- Work on a branch and open a Pull Request. Never commit directly to main.
+- Work on a branch and open a Pull Request into `test`. Never commit directly to main or test. Production only receives a PR from `test` into `main`, after the test environment is approved.
 - Each change starts from an Issue with acceptance criteria.
 - Secrets live only in environment variables. Never in code or chat. Names only in .env.example.
 - UI is Hebrew, RTL, mobile first.

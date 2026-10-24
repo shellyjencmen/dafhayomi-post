@@ -26,4 +26,9 @@
 
 ## מסמכים
 - אפיון: docs/spec.md. תפיסת פתרון: docs/solution.md. מצב: docs/runbook/STATE.md. הפעלה: docs/runbook/RUNBOOK.md. סביבת טסט: docs/runbook/TEST-ENV.md (בענף `test`).
+
+## מסלול שינוי (מ-24.10.2026)
+1. ענף עבודה ו-PR אל `test`. ל-PR יש כתובת בדיקה משלו.
+2. אחרי מיזוג אל `test`, האתר של הטסט מתעדכן והבודק בודק אותו.
+3. רק אחרי אישור: PR מ-`test` אל `main`. המיזוג שלו מעלה לייצור.
 </div>
