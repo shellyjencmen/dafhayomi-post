@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { publish, saveDraft, unpublish } from "./actions";
+import { BodyField } from "./BodyField";
 import { formatDaf } from "@/lib/daf";
 import styles from "../admin.module.css";
 
@@ -58,8 +59,8 @@ export function PostForm({
           <input id="summary" name="summary" maxLength={500} defaultValue={values.summary} />
         </div>
         <div className={styles.field}>
-          <label htmlFor="body">גוף הפוסט (עד 60,000 תווים, שורה ריקה בין פסקאות)</label>
-          <textarea id="body" name="body" defaultValue={values.body} required />
+          <label htmlFor="body">גוף הפוסט (עד 60,000 תווים, שורה ריקה בין פסקאות; הדבקה מגוגל דוקס שומרת הדגשות)</label>
+          <BodyField defaultValue={values.body} />
         </div>
         <div className={styles.actions}>
           <button className={styles.secondary} formAction={saveDraft.bind(null, id)}>
