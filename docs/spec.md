@@ -9,3 +9,10 @@ Full solution concept: docs/solution.md. MVP1 scope: public site, post managemen
 - Spam protection without personal data: a hidden field that bots fill, length limits, and a cap of 50 pending comments per post. No cookies and no identifiers are stored.
 - Owners: Avi, and Shelly as the vendor. The usage report shows published and pending comment counts.
 - Data: table `comments` (migration 0005). Readers can select only `approved` comments of published posts; inserts happen on the server with the secret key.
+
+## Deliverables and approvals (MVP4 data model, migration 0006)
+- A deliverable (status now; email and short post later) belongs to a post and to one `post_version_id`. A status has exactly two alternatives (`a`, `b`), each a list of cards taken from the post.
+- An approval is saved with the `post_version_id` it was given for. It is valid only while it is not revoked and that id equals the post's current version. Nothing is stored as "needs review": it is derived, so a new version of the post makes every earlier approval invalid at once (rules 3 and 4 in docs/solution.md 6.4).
+- Editing a card after approval revokes the approval (`revoked_at`). History stays.
+- Readers can read an alternative only when it has a valid approval for the current version of a published post. Drafts, unapproved alternatives, approvals and shares are visible to owners only.
+- "Shared" is one row per deliverable, so a second press adds nothing.
