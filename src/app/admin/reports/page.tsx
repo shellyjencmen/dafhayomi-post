@@ -43,7 +43,7 @@ export default async function ReportsPage() {
       <p className={styles.message}>כניסות מצטברות לפי פוסט וערוץ. לא נשמרים עוגיות או פרטים מזהים, וכניסות שלך ושל בוטים לא נספרות.</p>
       <h2>תגובות</h2>
       <p>
-        פורסמו: <strong>{commentCount("approved")}</strong> · ממתינות לאישור: <strong>{commentCount("pending")}</strong>
+        פורסמו: <strong>{commentCount("approved")}</strong> · הוסרו: <strong>{commentCount("removed")}</strong>
       </p>
       <h2>לפי ערוץ</h2>
       <ul className={styles.list}>
