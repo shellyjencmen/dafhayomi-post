@@ -47,6 +47,9 @@ a:hover {
   font-weight: 700;
   line-height: 1.1;
   text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
 }
 
 .site-tagline {
@@ -87,6 +90,13 @@ a:hover {
   text-align: center;
   color: var(--muted);
   font-size: 13px;
+}
+
+.site-footer a,
+.row-between a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
 }
 
 .page {

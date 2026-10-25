@@ -203,6 +203,12 @@
   align-self: start;
 }
 
+.report a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
 .report ul {
   padding-inline-start: 20px;
 }
