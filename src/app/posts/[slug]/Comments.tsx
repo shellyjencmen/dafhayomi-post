@@ -47,7 +47,7 @@ export function Comments({
         <button type="submit" className="button-link">
           שליחת תגובה
         </button>
-        <p className="muted">התגובה תתפרסם רק אחרי אישור של אבי.</p>
+        <p className="muted">התגובה מתפרסמת מיד. אבי יכול להסיר תגובה מהאתר.</p>
       </form>
     </section>
   );
