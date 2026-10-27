@@ -10,6 +10,8 @@ import { RichParagraph } from "@/lib/RichText";
 import { recordView } from "@/lib/views";
 import { Comments } from "./Comments";
 import { StatusCards } from "./StatusCards";
+import { PostBody } from "./PostBody";
+import { Shortcuts } from "@/app/Shortcuts";
 import { loadStatusCards } from "@/lib/status";
 
 export const dynamic = "force-dynamic";
@@ -51,21 +53,30 @@ async function loadPost(slug: string) {
 }
 
 async function loadPrevious(publishedOn: string | null, postId: string) {
-  if (!publishedOn) return null;
+  if (!publishedOn) return [];
   const db = publicClient();
-  const { data: prev } = await db
+  const { data: rows } = await db
     .from("posts")
-    .select("slug, daf, current_version_id, masechtot(name)")
+    .select("slug, daf, published_on, current_version_id, masechtot(name)")
     .eq("publish_state", "published")
     .not("current_version_id", "is", null)
     .lt("published_on", publishedOn)
     .neq("id", postId)
     .order("published_on", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  if (!prev) return null;
-  const { data: version } = await db.from("post_versions").select("title").eq("id", prev.current_version_id).maybeSingle();
-  return { slug: prev.slug as string, daf: prev.daf as number | null, masechtot: prev.masechtot, title: (version?.title as string | undefined) ?? "" };
+    .limit(3);
+  if (!rows?.length) return [];
+  const { data: versions } = await db
+    .from("post_versions")
+    .select("id, title")
+    .in("id", rows.map((r) => r.current_version_id));
+  const titles = new Map((versions ?? []).map((v: { id: string; title: string }) => [v.id, v.title]));
+  return rows.map((r) => ({
+    slug: r.slug as string,
+    daf: r.daf as number | null,
+    publishedOn: r.published_on as string | null,
+    masechtot: r.masechtot,
+    title: titles.get(r.current_version_id as string) ?? "",
+  }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -101,12 +112,18 @@ export default async function PostPage({
   const host = (await headers()).get("x-forwarded-host") ?? (await headers()).get("host");
   const shareUrl = host ? `https://${host}/posts/${post.slug}?src=whatsapp` : "";
   const shareText = encodeURIComponent(shareUrl ? `${version.title}\n${shareUrl}` : version.title);
-  const previousName = previous ? masechetName(previous.masechtot) : null;
+  const intro = paragraphs.slice(0, 2);
+  const rest = paragraphs.slice(2);
+  const shortcuts = [
+    ...(statusCards.length ? [{ href: "#status", title: "הרעיון בקצרה", sub: `${statusCards.length} כרטיסים · דקה` }] : []),
+    ...(images.length ? [{ href: "#gemara", title: "דפי הגמרא", sub: "המקור לעיון" }] : []),
+    ...(previous.length ? [{ href: "#previous", title: "פוסטים קודמים", sub: "וכל הארכיון" }] : []),
+  ];
 
   return (
     <main className="home">
-      <div className="home-grid">
-        <article className="home-post post-article">
+      <div className="post-layout">
+        <article className="post-main post-article">
           <div className="home-meta">
             <Link className="muted back" href="/archive">
               ‹ לארכיון
@@ -126,30 +143,53 @@ export default async function PostPage({
               </span>
             </span>
           </div>
-          <div className="post-body">
-            {paragraphs.map((text, i) => (
+          <PostBody
+            intro={intro.map((text, i) => (
               <RichParagraph key={i} text={text} />
             ))}
-          </div>
+            rest={
+              rest.length
+                ? rest.map((text, i) => <RichParagraph key={i} text={text} />)
+                : null
+            }
+            restMinutes={readingMinutes(rest.join(" "))}
+          />
+          <Shortcuts items={shortcuts} className="mobile-only" />
+        </article>
+        <aside className="post-side">
+          {images.length ? (
+            <div id="gemara">
+              <GemaraViewer images={images} />
+            </div>
+          ) : null}
           {statusCards.length ? <StatusCards cards={statusCards} /> : null}
+          {previous.length ? (
+            <section id="previous" className="side-previous">
+              <div className="row-between">
+                <strong>פוסטים קודמים</strong>
+                <Link href="/archive">לכל הארכיון</Link>
+              </div>
+              {previous.map((p) => {
+                const name = masechetName(p.masechtot);
+                return (
+                  <Link key={p.slug} className="card" href={`/posts/${p.slug}`}>
+                    <span className="muted">
+                      {name ? `${name} · דף ${formatDaf(p.daf)} · ` : ""}
+                      {formatPublishedOn(p.publishedOn)}
+                    </span>
+                    <span className="card-title">{p.title}</span>
+                  </Link>
+                );
+              })}
+            </section>
+          ) : null}
+        </aside>
+        <div className="post-rest">
           <a className="button-link wide outline" href={`https://wa.me/?text=${shareText}`} target="_blank" rel="noreferrer">
             שיתוף בוואטסאפ
           </a>
-          {previous ? (
-            <Link className="card" href={`/posts/${previous.slug}`}>
-              <span className="muted">
-                הפוסט הקודם{previousName ? ` · ${previousName}, דף ${formatDaf(previous.daf)}` : ""}
-              </span>
-              <span className="card-title">{previous.title}</span>
-            </Link>
-          ) : null}
           <Comments slug={post.slug} comments={comments} sent={query.sent === "1"} error={query.cerror} />
-        </article>
-        {images.length ? (
-          <aside className="home-side">
-            <GemaraViewer images={images} />
-          </aside>
-        ) : null}
+        </div>
       </div>
     </main>
   );

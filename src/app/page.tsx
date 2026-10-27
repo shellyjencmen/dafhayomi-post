@@ -6,6 +6,7 @@ import { RichParagraph } from "@/lib/RichText";
 import { loadStatusCards } from "@/lib/status";
 import { publicClient } from "@/lib/supabase";
 import { StatusCards } from "./posts/[slug]/StatusCards";
+import { Shortcuts } from "./Shortcuts";
 
 export const dynamic = "force-dynamic";
 
@@ -62,6 +63,11 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
   const truncated = allParagraphs.length > intro.length;
   const imageBase = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${GEMARA_BUCKET}`;
   const gemara = (pages ?? []) as GemaraRow[];
+  const shortcuts = [
+    ...(statusCards.length ? [{ href: "#status", title: "הרעיון בקצרה", sub: `${statusCards.length} כרטיסים · דקה` }] : []),
+    ...(gemara.length ? [{ href: "#gemara", title: "דפי הגמרא", sub: "המקור לעיון" }] : []),
+    ...(previous.length ? [{ href: "#previous", title: "פוסטים קודמים", sub: "וכל הארכיון" }] : []),
+  ];
 
   return (
     <main className="home">
@@ -92,23 +98,28 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
           <Link className="button-link wide" href={`/posts/${latest.slug}${channel}`}>
             להמשך הקריאה ולתגובות
           </Link>
-          {statusCards.length ? <StatusCards cards={statusCards} postHref={`/posts/${latest.slug}${channel}`} /> : null}
+          <Shortcuts items={shortcuts} />
         </section>
-        {gemara.length ? (
+        {statusCards.length || gemara.length ? (
           <aside className="home-side">
-            <GemaraViewer
+            {statusCards.length ? <StatusCards cards={statusCards} postHref={`/posts/${latest.slug}${channel}`} /> : null}
+            {gemara.length ? (
+              <div id="gemara">
+                <GemaraViewer
               images={gemara.map((page) => ({
                 id: page.id,
                 url: `${imageBase}/${page.image_path}`,
                 label: page.label,
                 alt: page.alt_text,
               }))}
-            />
+                />
+              </div>
+            ) : null}
           </aside>
         ) : null}
       </div>
       {previous.length ? (
-        <section className="home-previous">
+        <section id="previous" className="home-previous">
           <div className="row-between">
             <h2>פוסטים קודמים</h2>
             <Link href="/archive">לכל הארכיון</Link>
