@@ -3,7 +3,9 @@ import { GemaraViewer } from "./GemaraViewer";
 import { formatDaf } from "@/lib/daf";
 import { masechetName, paragraphsOf, readingMinutes, formatPublishedOn } from "@/lib/posts";
 import { RichParagraph } from "@/lib/RichText";
+import { loadStatusCards } from "@/lib/status";
 import { publicClient } from "@/lib/supabase";
+import { StatusCards } from "./posts/[slug]/StatusCards";
 
 export const dynamic = "force-dynamic";
 
@@ -48,9 +50,10 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
     );
   }
 
-  const [{ data: versions }, { data: pages }] = await Promise.all([
+  const [{ data: versions }, { data: pages }, statusCards] = await Promise.all([
     db.from("post_versions").select("id, title, body").in("id", rows.map((p) => p.current_version_id)),
     db.from("gemara_pages").select("id, label, alt_text, image_path").eq("post_id", latest.id).order("sort"),
+    loadStatusCards(db, latest.id),
   ]);
   const byId = new Map((versions ?? []).map((v: { id: string; title: string; body: string }) => [v.id, v]));
   const main = byId.get(latest.current_version_id);
@@ -89,6 +92,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
           <Link className="button-link wide" href={`/posts/${latest.slug}${channel}`}>
             להמשך הקריאה ולתגובות
           </Link>
+          {statusCards.length ? <StatusCards cards={statusCards} postHref={`/posts/${latest.slug}${channel}`} /> : null}
         </section>
         {gemara.length ? (
           <aside className="home-side">
