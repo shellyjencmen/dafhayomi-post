@@ -588,3 +588,116 @@ a:hover {
   font-size: 1rem;
   font-weight: 700;
 }
+
+.jump {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.jump-lead {
+  margin: 0;
+  font-size: 0.9rem;
+}
+.jump-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.jump-item {
+  display: flex;
+  flex-direction: column;
+  min-height: 44px;
+  padding: 10px 14px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--ink);
+  text-decoration: none;
+  line-height: 1.4;
+}
+.jump-item span {
+  font-size: 0.8rem;
+}
+.post-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "main" "side" "rest";
+  gap: 32px;
+}
+.post-main {
+  grid-area: main;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.post-side {
+  grid-area: side;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.post-side .status-cards {
+  margin: 0;
+  order: -1;
+}
+.post-rest {
+  grid-area: rest;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.side-previous {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.side-previous .card {
+  padding: 14px 16px;
+  gap: 4px;
+}
+.side-previous .card-title {
+  font-size: 18px;
+}
+.home-side .status-cards {
+  margin: 0;
+}
+.post-toggle {
+  border: 0;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+@media (max-width: 899px) {
+  .post-more:not(.open) {
+    display: none;
+  }
+  .fade-mobile {
+    position: relative;
+  }
+  .fade-mobile::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 90px;
+    background: linear-gradient(to bottom, rgba(251, 248, 243, 0), var(--ground));
+    pointer-events: none;
+  }
+}
+@media (min-width: 900px) {
+  .mobile-only {
+    display: none !important;
+  }
+  .jump-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .post-layout {
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+    grid-template-areas: "main side" "rest side";
+    column-gap: 56px;
+    align-items: start;
+  }
+  .post-side .status-cards {
+    order: 0;
+  }
+}
