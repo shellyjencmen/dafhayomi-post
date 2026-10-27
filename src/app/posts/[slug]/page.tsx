@@ -9,6 +9,7 @@ import { publicClient } from "@/lib/supabase";
 import { RichParagraph } from "@/lib/RichText";
 import { recordView } from "@/lib/views";
 import { Comments } from "./Comments";
+import { StatusCards } from "./StatusCards";
 
 export const dynamic = "force-dynamic";
 
@@ -121,7 +122,7 @@ export default async function PostPage({
             </Link>
             {masechet ? <span className="pill">{`${masechet} · דף ${formatDaf(post.daf)}`}</span> : null}
           </div>
-          <h1 className="post-title">{version.title}</h1>
+          <h1 id="post-top" className="post-title">{version.title}</h1>
           <div className="byline">
             <span className="avatar" aria-hidden="true">
               א
@@ -139,19 +140,7 @@ export default async function PostPage({
               <RichParagraph key={i} text={text} />
             ))}
           </div>
-          {statusCards.length ? (
-            <section className="status-cards" aria-label="הרעיון בקצרה">
-              <h2 className="status-title">הרעיון בקצרה</h2>
-              <ol className="status-list">
-                {statusCards.map((card, i) => (
-                  <li className="status-card" key={i}>
-                    {card.title ? <h3 className="status-card-title">{card.title}</h3> : null}
-                    <p>{card.text}</p>
-                  </li>
-                ))}
-              </ol>
-            </section>
-          ) : null}
+          {statusCards.length ? <StatusCards cards={statusCards} /> : null}
           <a className="button-link wide outline" href={`https://wa.me/?text=${shareText}`} target="_blank" rel="noreferrer">
             שיתוף בוואטסאפ
           </a>
