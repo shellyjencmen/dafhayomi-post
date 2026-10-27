@@ -16,5 +16,6 @@ export function formatPublishedOn(iso: string | null | undefined) {
 }
 
 export function paragraphsOf(body: string): string[] {
-  return String(body).split(/\n{2,}/).filter((p) => p.trim());
+  // Bodies pasted from Windows keep \r\n line endings; normalize before splitting into paragraphs.
+  return String(body).replace(/\r\n?/g, "\n").split(/\n{2,}/).filter((p) => p.trim());
 }
