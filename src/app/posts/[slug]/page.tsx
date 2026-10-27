@@ -45,7 +45,10 @@ async function loadPost(slug: string) {
     .eq("kind", "status")
     .limit(1);
   const statusAlt = (statusRows?.[0]?.alternatives as { cards: unknown }[] | undefined)?.[0];
-  const statusCards = Array.isArray(statusAlt?.cards) ? (statusAlt.cards as string[]) : [];
+  // A card is { title, text }; plain strings (older data) are shown as text only.
+  const statusCards = (Array.isArray(statusAlt?.cards) ? (statusAlt.cards as (string | { title?: string; text: string })[]) : []).map(
+    (c) => (typeof c === "string" ? { title: "", text: c } : { title: c.title ?? "", text: c.text }),
+  );
   const { data: comments } = await db
     .from("comments")
     .select("id, author_name, body, created_at")
@@ -142,7 +145,8 @@ export default async function PostPage({
               <ol className="status-list">
                 {statusCards.map((card, i) => (
                   <li className="status-card" key={i}>
-                    {card}
+                    {card.title ? <h3 className="status-card-title">{card.title}</h3> : null}
+                    <p>{card.text}</p>
                   </li>
                 ))}
               </ol>
