@@ -38,13 +38,24 @@ async function loadPost(slug: string) {
     loadPrevious(post.published_on, post.id),
   ]);
   if (!version) return null;
+  const { data: statusRows } = await db
+    .from("deliverables")
+    .select("alternatives(cards)")
+    .eq("post_id", post.id)
+    .eq("kind", "status")
+    .limit(1);
+  const statusAlt = (statusRows?.[0]?.alternatives as { cards: unknown }[] | undefined)?.[0];
+  // A card is { title, text }; plain strings (older data) are shown as text only.
+  const statusCards = (Array.isArray(statusAlt?.cards) ? (statusAlt.cards as (string | { title?: string; text: string })[]) : []).map(
+    (c) => (typeof c === "string" ? { title: "", text: c } : { title: c.title ?? "", text: c.text }),
+  );
   const { data: comments } = await db
     .from("comments")
     .select("id, author_name, body, created_at")
     .eq("post_id", post.id)
     .eq("status", "approved")
     .order("created_at");
-  return { post, version, pages: pages ?? [], previous, comments: comments ?? [] };
+  return { post, version, pages: pages ?? [], previous, comments: comments ?? [], statusCards };
 }
 
 async function loadPrevious(publishedOn: string | null, postId: string) {
@@ -81,7 +92,7 @@ export default async function PostPage({
   const { slug } = await params;
   const found = await loadPost(slug);
   if (!found) notFound();
-  const { post, version, pages, previous, comments } = found;
+  const { post, version, pages, previous, comments, statusCards } = found;
   const query = await searchParams;
   // The redirect after sending a comment is not a new visit.
   if (!query.sent && !query.cerror) await recordView(post.id, query.src);
@@ -128,6 +139,19 @@ export default async function PostPage({
               <RichParagraph key={i} text={text} />
             ))}
           </div>
+          {statusCards.length ? (
+            <section className="status-cards" aria-label="הרעיון בקצרה">
+              <h2 className="status-title">הרעיון בקצרה</h2>
+              <ol className="status-list">
+                {statusCards.map((card, i) => (
+                  <li className="status-card" key={i}>
+                    {card.title ? <h3 className="status-card-title">{card.title}</h3> : null}
+                    <p>{card.text}</p>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          ) : null}
           <a className="button-link wide outline" href={`https://wa.me/?text=${shareText}`} target="_blank" rel="noreferrer">
             שיתוף בוואטסאפ
           </a>
