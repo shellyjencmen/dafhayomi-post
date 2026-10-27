@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import type { StatusCard } from "@/lib/status";
 
-export type StatusCard = { title: string; text: string };
-
-export function StatusCards({ cards }: { cards: StatusCard[] }) {
+// postHref: where "read the full post" goes; omitted on the post page itself (jumps to the top).
+export function StatusCards({ cards, postHref }: { cards: StatusCard[]; postHref?: string }) {
   const [index, setIndex] = useState(0);
   const card = cards[index];
   const last = index === cards.length - 1;
@@ -34,9 +35,15 @@ export function StatusCards({ cards }: { cards: StatusCard[] }) {
           הבא ‹
         </button>
       </div>
-      <a className="status-more" href="#post-top">
-        מעוניינים להעמיק? לקריאת הפוסט המלא ‹
-      </a>
+      {postHref ? (
+        <Link className="status-more" href={postHref}>
+          מעוניינים להעמיק? לקריאת הפוסט המלא ‹
+        </Link>
+      ) : (
+        <a className="status-more" href="#post-top">
+          מעוניינים להעמיק? לקריאת הפוסט המלא ‹
+        </a>
+      )}
     </section>
   );
 }

@@ -10,6 +10,7 @@ import { RichParagraph } from "@/lib/RichText";
 import { recordView } from "@/lib/views";
 import { Comments } from "./Comments";
 import { StatusCards } from "./StatusCards";
+import { loadStatusCards } from "@/lib/status";
 
 export const dynamic = "force-dynamic";
 
@@ -39,17 +40,7 @@ async function loadPost(slug: string) {
     loadPrevious(post.published_on, post.id),
   ]);
   if (!version) return null;
-  const { data: statusRows } = await db
-    .from("deliverables")
-    .select("alternatives(cards)")
-    .eq("post_id", post.id)
-    .eq("kind", "status")
-    .limit(1);
-  const statusAlt = (statusRows?.[0]?.alternatives as { cards: unknown }[] | undefined)?.[0];
-  // A card is { title, text }; plain strings (older data) are shown as text only.
-  const statusCards = (Array.isArray(statusAlt?.cards) ? (statusAlt.cards as (string | { title?: string; text: string })[]) : []).map(
-    (c) => (typeof c === "string" ? { title: "", text: c } : { title: c.title ?? "", text: c.text }),
-  );
+  const statusCards = await loadStatusCards(db, post.id);
   const { data: comments } = await db
     .from("comments")
     .select("id, author_name, body, created_at")
