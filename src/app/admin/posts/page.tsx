@@ -3,6 +3,8 @@ import { masechetName } from "@/lib/posts";
 import Link from "next/link";
 import { adminClient } from "@/lib/supabase";
 import { sessionClient } from "@/lib/supabase-server";
+import { loadStatusSummaries } from "@/lib/status-admin";
+import { CONTENT_LABEL, WHATSAPP_LABEL, type StatusSummary } from "@/lib/status-state";
 import styles from "../admin.module.css";
 
 export const dynamic = "force-dynamic";
@@ -29,6 +31,7 @@ export default async function PostsPage({ searchParams }: { searchParams: Promis
     adminClient().from("page_views").select("post_id, channel"),
   ]);
   const rows = (data ?? []) as Row[];
+  const statuses = await loadStatusSummaries(supabase, rows);
 
   const latest = new Map<string, Version>();
   const byId = new Map<string, Version>();
@@ -66,6 +69,7 @@ export default async function PostsPage({ searchParams }: { searchParams: Promis
                   <th>פוסט</th>
                   <th>מצב</th>
                   <th>גרסה</th>
+                  <th>סטטוס</th>
                   <th>צפיות</th>
                 </tr>
               </thead>
@@ -91,6 +95,13 @@ export default async function PostsPage({ searchParams }: { searchParams: Promis
                         {current ? `${current.version_no}` : "-"}
                         {hasDraft ? <span className="muted"> (יש טיוטה חדשה)</span> : null}
                       </td>
+                      <td>
+                        {p.publish_state === "published" ? (
+                          <StatusCell postId={p.id} summary={statuses.get(p.id)?.summary} />
+                        ) : (
+                          "-"
+                        )}
+                      </td>
                       <td>{viewsByPost.get(p.id) ?? 0}</td>
                     </tr>
                   );
@@ -115,5 +126,18 @@ export default async function PostsPage({ searchParams }: { searchParams: Promis
         </aside>
       </div>
     </main>
+  );
+}
+
+function StatusCell({ postId, summary }: { postId: string; summary?: StatusSummary }) {
+  const content = summary?.content ?? "not_prepared";
+  const action = content === "pending" || content === "needs_review" ? "לאישור" : content === "not_prepared" ? "להכנה" : "לסטטוס";
+  return (
+    <>
+      <span className={styles.state}>{CONTENT_LABEL[content]}</span>
+      {summary?.whatsapp === "shared" ? <span className="muted"> · {WHATSAPP_LABEL.shared}</span> : null}
+      <br />
+      <Link href={`/admin/posts/${postId}/status`}>{action}</Link>
+    </>
   );
 }
