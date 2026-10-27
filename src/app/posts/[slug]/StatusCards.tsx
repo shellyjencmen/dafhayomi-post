@@ -11,17 +11,12 @@ export function StatusCards({ cards, postHref }: { cards: StatusCard[]; postHref
   const last = index === cards.length - 1;
 
   return (
-    <section className="status-cards" aria-label="הרעיון בקצרה">
+    <section id="status" className="status-cards" aria-label="הרעיון בקצרה">
       <div className="status-head">
-        <h2 className="status-title">לא מצליחים להעמיק בפוסט? הרעיון בקצרה</h2>
+        <h2 className="status-title">הרעיון בקצרה</h2>
         <span className="status-count muted">
           {index + 1} מתוך {cards.length}
         </span>
-      </div>
-      <div className="status-strip" aria-hidden="true">
-        {cards.map((_, i) => (
-          <i key={i} className={i <= index ? "on" : ""} />
-        ))}
       </div>
       <div className="status-card" aria-live="polite">
         {card.title ? <h3 className="status-card-title">{card.title}</h3> : null}
@@ -37,11 +32,11 @@ export function StatusCards({ cards, postHref }: { cards: StatusCard[]; postHref
       </div>
       {postHref ? (
         <Link className="status-more" href={postHref}>
-          מעוניינים להעמיק? לקריאת הפוסט המלא ‹
+          לקריאת הפוסט המלא ‹
         </Link>
       ) : (
         <a className="status-more" href="#post-top">
-          מעוניינים להעמיק? לקריאת הפוסט המלא ‹
+          לקריאת הפוסט המלא ‹
         </a>
       )}
     </section>
