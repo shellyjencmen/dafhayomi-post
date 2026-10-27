@@ -518,3 +518,36 @@ a:hover {
   gap: 12px;
   margin-top: 20px;
 }
+
+.status-cards {
+  margin: 24px 0;
+}
+.status-title {
+  font-size: 1.1rem;
+  margin: 0 0 12px;
+}
+.status-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+.status-card {
+  background: #f4ecdd;
+  border-right: 4px solid #a87b2a;
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+.status-card-title {
+  margin: 0 0 6px;
+  font-family: "Frank Ruhl Libre", serif;
+  font-size: 1.3rem;
+  line-height: 1.25;
+}
+.status-card p {
+  margin: 0;
+  font-family: "Frank Ruhl Libre", serif;
+  font-size: 1.1rem;
+  line-height: 1.75;
+}
