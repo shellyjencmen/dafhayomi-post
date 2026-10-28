@@ -59,9 +59,11 @@ export function ShortPost({ cards, post }: { cards: StatusCard[]; post: ShortPos
           </p>
         ))}
       </div>
-      <button type="button" className="button-link wide outline" onClick={download} disabled={!blob}>
-        הורדת התמונה
-      </button>
+      <div className="status-download">
+        <button type="button" onClick={download} disabled={!blob}>
+          הורדת התמונה
+        </button>
+      </div>
     </section>
   );
 }
