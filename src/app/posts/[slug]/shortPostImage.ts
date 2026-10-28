@@ -18,7 +18,6 @@ const COLORS = {
   line: "#e7e0d4",
   tint: "#f4ecdd",
 };
-const BODY_TOP = 380;
 const FOOT_TOP = 1584;
 
 export type ShortPostMeta = { slug: string; title: string; meta: string };
@@ -42,7 +41,7 @@ function wrap(ctx: CanvasRenderingContext2D, text: string, width: number): strin
 type Block = { lead: boolean; title: string[]; body: string[]; height: number };
 
 // Lays the cards out at font size f; returns null when they do not fit the body area.
-function layout(ctx: CanvasRenderingContext2D, cards: StatusCard[], f: number): Block[] | null {
+function layout(ctx: CanvasRenderingContext2D, cards: StatusCard[], f: number, top: number): Block[] | null {
   const blocks: Block[] = [];
   let total = 0;
   for (const card of cards) {
@@ -59,7 +58,7 @@ function layout(ctx: CanvasRenderingContext2D, cards: StatusCard[], f: number): 
     blocks.push({ lead, title, body, height });
     total += height + f * 0.8;
   }
-  return total <= FOOT_TOP - BODY_TOP - 40 ? blocks : null;
+  return total <= FOOT_TOP - top - 40 ? blocks : null;
 }
 
 async function draw(cards: StatusCard[], post: ShortPostMeta): Promise<HTMLCanvasElement> {
@@ -81,16 +80,29 @@ async function draw(cards: StatusCard[], post: ShortPostMeta): Promise<HTMLCanva
   ctx.font = `400 30px ${SANS}`;
   ctx.fillText(post.meta, right, 146);
   ctx.fillStyle = COLORS.ink;
-  ctx.font = `700 84px ${SERIF}`;
-  ctx.fillText(wrap(ctx, post.title, W - 2 * PAD)[0] ?? "", right, 200);
+  // A long title shrinks to fit two or three lines.
+  let titleSize = 84;
+  let title: string[] = [];
+  for (const [size, maxLines] of [[84, 1], [64, 2], [52, 3], [44, 4]]) {
+    titleSize = size;
+    ctx.font = `700 ${size}px ${SERIF}`;
+    title = wrap(ctx, post.title, W - 2 * PAD);
+    if (title.length <= maxLines) break;
+  }
+  let titleY = 200;
+  for (const line of title) {
+    ctx.fillText(line, right, titleY);
+    titleY += titleSize * 1.15;
+  }
   ctx.fillStyle = COLORS.gold;
   ctx.font = `500 30px ${SANS}`;
-  ctx.fillText("הפוסט בקצרה", right, 312);
+  ctx.fillText("הפוסט בקצרה", right, titleY + 16);
+  const top = titleY + 84;
 
   let f = 50;
-  let blocks = layout(ctx, cards, f);
-  while (!blocks && f > 24) blocks = layout(ctx, cards, (f -= 1));
-  let y = BODY_TOP;
+  let blocks = layout(ctx, cards, f, top);
+  while (!blocks && f > 24) blocks = layout(ctx, cards, (f -= 1), top);
+  let y = top;
   for (const b of blocks ?? []) {
     if (b.lead) {
       ctx.fillStyle = COLORS.gold;
