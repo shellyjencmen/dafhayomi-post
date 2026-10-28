@@ -1,7 +1,15 @@
 /** Shared helpers for showing posts to readers. */
 
+import { formatDaf } from "./daf";
+
 export function masechetName(m: { name: string } | { name: string }[] | null | undefined) {
   return Array.isArray(m) ? m[0]?.name : m?.name;
+}
+
+/** The line under the brand on the short post image, e.g. "בכורות, דף ל"א · אבי יוניצמן". */
+export function shortPostMeta(m: { name: string } | { name: string }[] | null | undefined, daf: number | null) {
+  const name = masechetName(m);
+  return name ? `${name}, דף ${formatDaf(daf)} · אבי יוניצמן` : "אבי יוניצמן";
 }
 
 /** Suggestion only (about 200 words per minute); shown as "N דקות קריאה". */
