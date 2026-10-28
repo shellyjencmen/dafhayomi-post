@@ -12,9 +12,9 @@ export function GemaraViewer({ images }: { images: GemaraImageView[] }) {
   if (!current) return null;
   return (
     <div className="gemara-viewer">
-      <div className="side-title">
-        <strong>דף הגמרא לעיון</strong>
-        <span className="muted">רפרנס לטקסט</span>
+      <div className="status-head">
+        <h2 className="status-title">דף הגמרא לעיון</h2>
+        <span className="status-count muted">רפרנס לטקסט</span>
       </div>
       {images.length > 1 ? (
         <div className="gemara-tabs" role="tablist" aria-label="עמודי הגמרא">

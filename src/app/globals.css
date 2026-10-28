@@ -130,7 +130,7 @@ a:hover {
 }
 
 .gemara-page {
-  margin: 16px 0;
+  margin: 0;
 }
 
 .gemara-page img {
@@ -138,6 +138,8 @@ a:hover {
   height: auto;
   border-radius: 8px;
   border: 1px solid var(--line);
+  /* The scan's white paper takes the page's cream background. */
+  mix-blend-mode: multiply;
 }
 
 .button-link {
@@ -352,11 +354,6 @@ a:hover {
   }
 }
 
-.gemara-viewer {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
 
 .gemara-tabs {
   display: flex;
@@ -519,7 +516,10 @@ a:hover {
   margin-top: 20px;
 }
 
-.status-cards {
+/* Status, short post and Gemara share one box: same width, background and title inside. */
+.status-cards,
+.short-post,
+.gemara-viewer {
   margin: 24px 0;
   background: var(--ground);
   border: 1px solid var(--line);
@@ -683,7 +683,9 @@ a:hover {
   flex-direction: column;
   gap: 24px;
 }
-.post-side .status-cards {
+.post-side .status-cards,
+.post-side .short-post,
+.post-side .gemara-viewer {
   margin: 0;
 }
 .post-comments-link {
@@ -737,21 +739,12 @@ a:hover {
   }
 }
 
-.short-post {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
 .short-post-frame {
   aspect-ratio: 1080 / 1920;
-  max-height: 80vh;
-  background: #fff;
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: 12px;
   overflow: hidden;
-  align-self: center;
   width: 100%;
-  max-width: calc(80vh * 1080 / 1920);
 }
 .short-post-frame a {
   display: block;
