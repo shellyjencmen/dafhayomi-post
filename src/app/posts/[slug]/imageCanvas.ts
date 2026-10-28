@@ -49,13 +49,41 @@ export function newCanvas(): [HTMLCanvasElement, CanvasRenderingContext2D] {
   return [canvas, ctx];
 }
 
-// Site name, masechet and daf, the post title, and a gold line naming what this image is.
+// The site mark (src/app/Logo.tsx) at the given top left corner and size.
+export function drawLogo(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
+  const u = size / 64;
+  const rect = (rx: number, ry: number, w: number, h: number, r: number) => {
+    ctx.beginPath();
+    ctx.roundRect(x + rx * u, y + ry * u, w * u, h * u, r * u);
+  };
+  rect(6, 4, 52, 56, 5);
+  ctx.fillStyle = COLORS.tint;
+  ctx.fill();
+  ctx.lineWidth = 3 * u;
+  ctx.strokeStyle = COLORS.accent;
+  ctx.stroke();
+  rect(22, 12, 20, 26, 1.5);
+  ctx.fillStyle = COLORS.gold;
+  ctx.fill();
+  ctx.fillStyle = COLORS.accent;
+  for (let ly = 12; ly <= 52; ly += 5) {
+    rect(12, ly, ly < 40 ? 7 : 40, 2.4, 1.2);
+    ctx.fill();
+    if (ly <= 37) {
+      rect(45, ly, 7, 2.4, 1.2);
+      ctx.fill();
+    }
+  }
+}
+
+// Site mark and name, masechet and daf, the post title, and a gold line naming what this image is.
 // A long title shrinks to fit two to four lines. Returns where the body starts.
 export function drawHeader(ctx: CanvasRenderingContext2D, post: ImagePost, kind: string): number {
   const right = W - PAD;
   ctx.fillStyle = COLORS.accent;
   ctx.font = `700 48px ${SERIF}`;
-  ctx.fillText("הדף היומי", right, 80);
+  drawLogo(ctx, right - 60, 76, 60);
+  ctx.fillText("הדף היומי", right - 76, 80);
   ctx.fillStyle = COLORS.muted;
   ctx.font = `400 30px ${SANS}`;
   ctx.fillText(post.meta, right, 146);

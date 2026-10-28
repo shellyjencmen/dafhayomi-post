@@ -49,6 +49,7 @@ a:hover {
   text-decoration: none;
   display: inline-flex;
   align-items: center;
+  gap: 10px;
   min-height: 44px;
 }
 

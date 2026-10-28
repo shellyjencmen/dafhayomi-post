@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import Link from "next/link";
+import { Logo } from "./Logo";
 import { NavLink } from "./NavLink";
 import "./globals.css";
 
-const DESCRIPTION = "רעיון אחד מהדף היומי, מדי שבוע";
+const DESCRIPTION = "רעיון אחד מהדף, בכל שבוע";
 
 // Link previews (WhatsApp and others) need absolute URLs, so the base is the host that served the page.
 export async function generateMetadata(): Promise<Metadata> {
@@ -31,9 +32,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <header className="site-header">
           <Link className="site-title" href="/">
+            <Logo size={40} />
             הדף היומי
           </Link>
-          <div className="site-tagline">רעיון אחד על הדף, כל שבוע · אבי יוניצמן</div>
+          <div className="site-tagline">רעיון אחד מהדף, בכל שבוע · אבי יוניצמן</div>
           <nav className="site-nav" aria-label="ניווט ראשי">
             <NavLink href="/" exact>
               השבוע
