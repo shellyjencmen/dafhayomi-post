@@ -66,7 +66,7 @@ async function draw(card: StatusCard, n: number, total: number, post: { slug: st
 
   // The card: tint box with the gold right border, like on the site.
   const top = 340;
-  const bottom = last ? H - 760 : H - 300;
+  const bottom = last ? H - 840 : H - 300;
   ctx.fillStyle = COLORS.tint;
   ctx.beginPath();
   ctx.roundRect(PAD, top, W - 2 * PAD, bottom - top, 36);
@@ -105,13 +105,18 @@ async function draw(card: StatusCard, n: number, total: number, post: { slug: st
     ctx.font = `400 32px ${SANS}`;
     ctx.fillText("סרקו את הקוד", right, qrTop + 110);
     ctx.fillStyle = COLORS.accent;
+    // The address gets its own full-width line under the code; a long host goes on its own line, shrunk to fit.
     ctx.direction = "ltr";
-    const shown = url.replace(/^https?:\/\//, "").replace(/\?.*$/, "");
-    const room = right - (PAD + 340 + 40);
-    let size = 32;
-    do ctx.font = `500 ${size--}px ${SANS}`;
-    while (ctx.measureText(shown).width > room && size > 14);
-    ctx.fillText(shown, right, qrTop + 170);
+    ctx.textAlign = "center";
+    const widthOf = (text: string) => ctx.measureText(text).width;
+    const { host, pathname } = new URL(url);
+    let lines = [host + pathname];
+    let size = 34;
+    ctx.font = `500 ${size}px ${SANS}`;
+    if (widthOf(lines[0]) > W - 2 * PAD) lines = [host, pathname];
+    while (size > 18 && lines.some((l) => widthOf(l) > W - 2 * PAD)) ctx.font = `500 ${--size}px ${SANS}`;
+    lines.forEach((l, i) => ctx.fillText(l, W / 2, qrTop + 340 + 36 + i * size * 1.4));
+    ctx.textAlign = "right";
     ctx.direction = "rtl";
   }
 
