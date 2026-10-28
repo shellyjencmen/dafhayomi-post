@@ -521,7 +521,7 @@ a:hover {
 
 .status-cards {
   margin: 24px 0;
-  background: #fff;
+  background: var(--ground);
   border: 1px solid var(--line);
   border-radius: 16px;
   padding: 20px 20px 16px;
