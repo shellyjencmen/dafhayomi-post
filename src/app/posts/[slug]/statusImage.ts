@@ -1,3 +1,4 @@
+import QRCode from "qrcode";
 import type { StatusCard } from "@/lib/status";
 
 // Draws status cards as 1080x1920 PNGs (WhatsApp status size) in the site's design, in the browser.
@@ -40,7 +41,10 @@ function layout(ctx: CanvasRenderingContext2D, card: StatusCard, width: number, 
   }
 }
 
-function draw(card: StatusCard, n: number, total: number, postTitle: string): HTMLCanvasElement {
+// The last card carries a QR code to the post, since a link inside a status image cannot be tapped.
+async function draw(card: StatusCard, n: number, total: number, post: { slug: string; title: string }): Promise<HTMLCanvasElement> {
+  const postTitle = post.title;
+  const last = n === total;
   const canvas = document.createElement("canvas");
   canvas.width = W;
   canvas.height = H;
@@ -62,7 +66,7 @@ function draw(card: StatusCard, n: number, total: number, postTitle: string): HT
 
   // The card: tint box with the gold right border, like on the site.
   const top = 340;
-  const bottom = H - 300;
+  const bottom = last ? H - 760 : H - 300;
   ctx.fillStyle = COLORS.tint;
   ctx.beginPath();
   ctx.roundRect(PAD, top, W - 2 * PAD, bottom - top, 36);
@@ -86,6 +90,29 @@ function draw(card: StatusCard, n: number, total: number, postTitle: string): HT
   for (const line of fit.body) {
     ctx.fillText(line, textRight, y + fit.size * 0.25);
     y += fit.size * 1.6;
+  }
+
+  if (last) {
+    const url = `${window.location.origin}/posts/${post.slug}?src=status`;
+    const qr = document.createElement("canvas");
+    await QRCode.toCanvas(qr, url, { width: 340, margin: 2, color: { dark: COLORS.accent, light: "#ffffff" } });
+    const qrTop = bottom + 60;
+    ctx.drawImage(qr, PAD, qrTop, 340, 340);
+    ctx.fillStyle = COLORS.ink;
+    ctx.font = `700 44px ${SERIF}`;
+    ctx.fillText("לפוסט המלא", right, qrTop + 40);
+    ctx.fillStyle = COLORS.muted;
+    ctx.font = `400 32px ${SANS}`;
+    ctx.fillText("סרקו את הקוד", right, qrTop + 110);
+    ctx.fillStyle = COLORS.accent;
+    ctx.direction = "ltr";
+    const shown = url.replace(/^https?:\/\//, "").replace(/\?.*$/, "");
+    const room = right - (PAD + 340 + 40);
+    let size = 32;
+    do ctx.font = `500 ${size--}px ${SANS}`;
+    while (ctx.measureText(shown).width > room && size > 14);
+    ctx.fillText(shown, right, qrTop + 170);
+    ctx.direction = "rtl";
   }
 
   ctx.fillStyle = COLORS.ink;
@@ -120,7 +147,7 @@ export async function downloadStatusImages(cards: StatusCard[], indexes: number[
   ]).catch(() => undefined);
   const files = await Promise.all(
     indexes.map(async (i) => {
-      const blob = await toBlob(draw(cards[i], i + 1, cards.length, post.title));
+      const blob = await toBlob(await draw(cards[i], i + 1, cards.length, post));
       return new File([blob], `status-${post.slug}-${i + 1}.png`, { type: "image/png" });
     }),
   );
