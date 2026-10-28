@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+const LETTERS = "אבגדהוזחטיכלמנסעפצקרשת";
+
 export type GemaraImageView = { id: string; url: string; label: string | null; alt: string | null };
 
 export function GemaraViewer({ images }: { images: GemaraImageView[] }) {
@@ -25,7 +27,7 @@ export function GemaraViewer({ images }: { images: GemaraImageView[] }) {
               className={i === active ? "chip chip-on" : "chip"}
               onClick={() => setActive(i)}
             >
-              {image.label || `עמוד ${i + 1}`}
+              {`דף ${LETTERS[i] ?? i + 1}'`}
             </button>
           ))}
         </div>

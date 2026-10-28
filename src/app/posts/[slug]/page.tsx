@@ -2,14 +2,13 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { GemaraViewer } from "@/app/GemaraViewer";
+import { PostSide } from "@/app/PostSide";
 import { formatDaf } from "@/lib/daf";
 import { masechetName, formatPublishedOn, paragraphsOf, readingMinutes } from "@/lib/posts";
 import { publicClient } from "@/lib/supabase";
 import { RichParagraph } from "@/lib/RichText";
 import { recordView } from "@/lib/views";
 import { Comments } from "./Comments";
-import { StatusCards } from "./StatusCards";
 import { PostBody } from "./PostBody";
 import { Shortcuts } from "@/app/Shortcuts";
 import { loadStatusCards } from "@/lib/status";
@@ -82,7 +81,20 @@ async function loadPrevious(publishedOn: string | null, postId: string) {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const found = await loadPost((await params).slug);
   if (!found) return { title: "לא נמצא" };
-  return { title: found.version.title, description: found.version.summary ?? undefined };
+  const opening = paragraphsOf(found.version.body)[0]?.replace(/\s+/g, " ").trim() ?? "";
+  const description = found.version.summary || (opening.length > 160 ? `${opening.slice(0, 157)}...` : opening) || undefined;
+  return {
+    title: found.version.title,
+    description,
+    openGraph: {
+      type: "article",
+      locale: "he_IL",
+      siteName: "הדף היומי",
+      title: found.version.title,
+      description,
+      images: [{ url: "/og.png", width: 1200, height: 630, alt: "הדף היומי" }],
+    },
+  };
 }
 
 export default async function PostPage({
@@ -154,36 +166,9 @@ export default async function PostPage({
             }
             restMinutes={readingMinutes(rest.join(" "))}
           />
-          <Shortcuts items={shortcuts} className="mobile-only" />
+          <Shortcuts items={shortcuts} />
         </article>
-        <aside className="post-side">
-          {images.length ? (
-            <div id="gemara">
-              <GemaraViewer images={images} />
-            </div>
-          ) : null}
-          {statusCards.length ? <StatusCards cards={statusCards} /> : null}
-          {previous.length ? (
-            <section id="previous" className="side-previous">
-              <div className="row-between">
-                <strong>פוסטים קודמים</strong>
-                <Link href="/archive">לכל הארכיון</Link>
-              </div>
-              {previous.map((p) => {
-                const name = masechetName(p.masechtot);
-                return (
-                  <Link key={p.slug} className="card" href={`/posts/${p.slug}`}>
-                    <span className="muted">
-                      {name ? `${name} · דף ${formatDaf(p.daf)} · ` : ""}
-                      {formatPublishedOn(p.publishedOn)}
-                    </span>
-                    <span className="card-title">{p.title}</span>
-                  </Link>
-                );
-              })}
-            </section>
-          ) : null}
-        </aside>
+        <PostSide post={{ slug: post.slug, title: version.title }} statusCards={statusCards} images={images} previous={previous} />
         <div className="post-rest">
           <a className="button-link wide outline" href={`https://wa.me/?text=${shareText}`} target="_blank" rel="noreferrer">
             שיתוף בוואטסאפ

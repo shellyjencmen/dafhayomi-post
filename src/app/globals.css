@@ -544,7 +544,12 @@ a:hover {
   font-size: 0.8rem;
   white-space: nowrap;
 }
+.status-stack {
+  display: grid;
+}
 .status-card {
+  grid-area: 1 / 1;
+  visibility: hidden;
   min-height: 104px;
   display: flex;
   flex-direction: column;
@@ -580,6 +585,30 @@ a:hover {
 .status-nav button:disabled {
   opacity: 0.4;
   cursor: default;
+}
+.status-card.active {
+  visibility: visible;
+}
+.status-download {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  font-size: 0.9rem;
+}
+.status-download button {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: 700 0.9rem "Heebo", sans-serif;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.status-download button:disabled {
+  opacity: 0.5;
+  cursor: progress;
 }
 .status-more {
   min-height: 44px;
@@ -638,7 +667,12 @@ a:hover {
 }
 .post-side .status-cards {
   margin: 0;
-  order: -1;
+}
+.post-comments-link {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 700;
 }
 .post-rest {
   grid-area: rest;
@@ -667,22 +701,8 @@ a:hover {
   font-weight: 700;
   cursor: pointer;
 }
-@media (max-width: 899px) {
-  .post-more:not(.open) {
-    display: none;
-  }
-  .fade-mobile {
-    position: relative;
-  }
-  .fade-mobile::after {
-    content: "";
-    position: absolute;
-    inset-inline: 0;
-    bottom: 0;
-    height: 90px;
-    background: linear-gradient(to bottom, rgba(251, 248, 243, 0), var(--ground));
-    pointer-events: none;
-  }
+.post-more:not(.open) {
+  display: none;
 }
 @media (min-width: 900px) {
   .mobile-only {
@@ -696,8 +716,5 @@ a:hover {
     grid-template-areas: "main side" "rest side";
     column-gap: 56px;
     align-items: start;
-  }
-  .post-side .status-cards {
-    order: 0;
   }
 }
