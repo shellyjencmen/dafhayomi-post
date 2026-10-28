@@ -4,10 +4,11 @@ import { useState } from "react";
 import Link from "next/link";
 import type { StatusCard } from "@/lib/status";
 import { downloadStatusImages } from "./statusImage";
+import type { ImagePost } from "./imageCanvas";
 
 // postHref: where "read the full post" goes; omitted on the post page itself (jumps to the top).
 // All cards are stacked in one grid cell so the box keeps the height of the tallest card.
-export function StatusCards({ cards, post, postHref }: { cards: StatusCard[]; post: { slug: string; title: string }; postHref?: string }) {
+export function StatusCards({ cards, post, postHref }: { cards: StatusCard[]; post: ImagePost; postHref?: string }) {
   const [index, setIndex] = useState(0);
   const [busy, setBusy] = useState(false);
   const last = index === cards.length - 1;
