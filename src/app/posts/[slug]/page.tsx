@@ -4,14 +4,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PostSide } from "@/app/PostSide";
 import { formatDaf } from "@/lib/daf";
-import { masechetName, formatPublishedOn, paragraphsOf, readingMinutes } from "@/lib/posts";
+import { masechetName, formatPublishedOn, paragraphsOf, readingMinutes, shortPostMeta } from "@/lib/posts";
 import { publicClient } from "@/lib/supabase";
 import { RichParagraph } from "@/lib/RichText";
 import { recordView } from "@/lib/views";
 import { Comments } from "./Comments";
 import { PostBody } from "./PostBody";
 import { Shortcuts } from "@/app/Shortcuts";
-import { loadStatusCards } from "@/lib/status";
+import { loadShortPost, loadStatusCards } from "@/lib/status";
 
 export const dynamic = "force-dynamic";
 
@@ -41,14 +41,14 @@ async function loadPost(slug: string) {
     loadPrevious(post.published_on, post.id),
   ]);
   if (!version) return null;
-  const statusCards = await loadStatusCards(db, post.id);
+  const [statusCards, shortPost] = await Promise.all([loadStatusCards(db, post.id), loadShortPost(db, post.id)]);
   const { data: comments } = await db
     .from("comments")
     .select("id, author_name, body, created_at")
     .eq("post_id", post.id)
     .eq("status", "approved")
     .order("created_at");
-  return { post, version, pages: pages ?? [], previous, comments: comments ?? [], statusCards };
+  return { post, version, pages: pages ?? [], previous, comments: comments ?? [], statusCards, shortPost };
 }
 
 async function loadPrevious(publishedOn: string | null, postId: string) {
@@ -107,7 +107,7 @@ export default async function PostPage({
   const { slug } = await params;
   const found = await loadPost(slug);
   if (!found) notFound();
-  const { post, version, pages, previous, comments, statusCards } = found;
+  const { post, version, pages, previous, comments, statusCards, shortPost } = found;
   const query = await searchParams;
   // The redirect after sending a comment is not a new visit.
   if (!query.sent && !query.cerror) await recordView(post.id, query.src);
@@ -128,6 +128,7 @@ export default async function PostPage({
   const rest = paragraphs.slice(2);
   const shortcuts = [
     ...(statusCards.length ? [{ href: "#status", title: "הרעיון בקצרה", sub: `${statusCards.length} כרטיסים · דקה` }] : []),
+    ...(shortPost.length ? [{ href: "#short", title: "הפוסט בקצרה", sub: "בתמונה אחת" }] : []),
     ...(images.length ? [{ href: "#gemara", title: "דפי הגמרא", sub: "המקור לעיון" }] : []),
     ...(previous.length ? [{ href: "#previous", title: "פוסטים קודמים", sub: "וכל הארכיון" }] : []),
   ];
@@ -168,7 +169,13 @@ export default async function PostPage({
           />
           <Shortcuts items={shortcuts} />
         </article>
-        <PostSide post={{ slug: post.slug, title: version.title }} statusCards={statusCards} images={images} previous={previous} />
+        <PostSide
+          post={{ slug: post.slug, title: version.title, meta: shortPostMeta(post.masechtot, post.daf) }}
+          statusCards={statusCards}
+          shortPost={shortPost}
+          images={images}
+          previous={previous}
+        />
         <div className="post-rest">
           <a className="button-link wide outline" href={`https://wa.me/?text=${shareText}`} target="_blank" rel="noreferrer">
             שיתוף בוואטסאפ

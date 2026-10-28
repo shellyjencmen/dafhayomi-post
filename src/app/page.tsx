@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { formatDaf } from "@/lib/daf";
-import { masechetName, paragraphsOf, readingMinutes, formatPublishedOn } from "@/lib/posts";
+import { masechetName, paragraphsOf, readingMinutes, formatPublishedOn, shortPostMeta } from "@/lib/posts";
 import { RichParagraph } from "@/lib/RichText";
-import { loadStatusCards } from "@/lib/status";
+import { loadShortPost, loadStatusCards } from "@/lib/status";
 import { publicClient } from "@/lib/supabase";
 import { PostBody } from "./posts/[slug]/PostBody";
 import { PostSide } from "./PostSide";
@@ -51,10 +51,11 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
     );
   }
 
-  const [{ data: versions }, { data: pages }, statusCards] = await Promise.all([
+  const [{ data: versions }, { data: pages }, statusCards, shortPost] = await Promise.all([
     db.from("post_versions").select("id, title, body").in("id", rows.map((p) => p.current_version_id)),
     db.from("gemara_pages").select("id, label, alt_text, image_path").eq("post_id", latest.id).order("sort"),
     loadStatusCards(db, latest.id),
+    loadShortPost(db, latest.id),
   ]);
   const byId = new Map((versions ?? []).map((v: { id: string; title: string; body: string }) => [v.id, v]));
   const main = byId.get(latest.current_version_id);
@@ -79,6 +80,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
   }));
   const shortcuts = [
     ...(statusCards.length ? [{ href: "#status", title: "הרעיון בקצרה", sub: `${statusCards.length} כרטיסים · דקה` }] : []),
+    ...(shortPost.length ? [{ href: "#short", title: "הפוסט בקצרה", sub: "בתמונה אחת" }] : []),
     ...(images.length ? [{ href: "#gemara", title: "דפי הגמרא", sub: "המקור לעיון" }] : []),
     ...(previous.length ? [{ href: "#previous", title: "פוסטים קודמים", sub: "וכל הארכיון" }] : []),
   ];
@@ -117,7 +119,13 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
           </Link>
           <Shortcuts items={shortcuts} />
         </section>
-        <PostSide post={{ slug: latest.slug, title }} statusCards={statusCards} images={images} previous={previousPosts} />
+        <PostSide
+          post={{ slug: latest.slug, title, meta: shortPostMeta(latest.masechtot, latest.daf) }}
+          statusCards={statusCards}
+          shortPost={shortPost}
+          images={images}
+          previous={previousPosts}
+        />
       </div>
     </main>
   );
