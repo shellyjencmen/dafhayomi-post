@@ -1,5 +1,5 @@
 import type { StatusCard } from "@/lib/status";
-import { BODY_TOP, COLORS, FOOT_TOP, PAD, SERIF, W, drawHeader, drawQrFooter, loadFonts, newCanvas, toBlob, wrap, type ImagePost } from "./imageCanvas";
+import { COLORS, FOOT_TOP, PAD, SERIF, W, drawHeader, drawQrFooter, loadFonts, newCanvas, toBlob, wrap, type ImagePost } from "./imageCanvas";
 
 export type ShortPostMeta = ImagePost;
 
@@ -9,7 +9,7 @@ export type ShortPostMeta = ImagePost;
 type Block = { lead: boolean; title: string[]; body: string[]; height: number };
 
 // Lays the cards out at font size f; returns null when they do not fit the body area.
-function layout(ctx: CanvasRenderingContext2D, cards: StatusCard[], f: number): Block[] | null {
+function layout(ctx: CanvasRenderingContext2D, cards: StatusCard[], f: number, top: number): Block[] | null {
   const blocks: Block[] = [];
   let total = 0;
   for (const card of cards) {
@@ -26,18 +26,18 @@ function layout(ctx: CanvasRenderingContext2D, cards: StatusCard[], f: number): 
     blocks.push({ lead, title, body, height });
     total += height + f * 0.8;
   }
-  return total <= FOOT_TOP - BODY_TOP - 40 ? blocks : null;
+  return total <= FOOT_TOP - top - 40 ? blocks : null;
 }
 
 async function draw(cards: StatusCard[], post: ShortPostMeta): Promise<HTMLCanvasElement> {
   const [canvas, ctx] = newCanvas();
   const right = W - PAD;
-  drawHeader(ctx, post, "הפוסט בקצרה");
+  const top = drawHeader(ctx, post, "הפוסט בקצרה");
 
   let f = 50;
-  let blocks = layout(ctx, cards, f);
-  while (!blocks && f > 24) blocks = layout(ctx, cards, (f -= 1));
-  let y = BODY_TOP;
+  let blocks = layout(ctx, cards, f, top);
+  while (!blocks && f > 24) blocks = layout(ctx, cards, (f -= 1), top);
+  let y = top;
   for (const b of blocks ?? []) {
     if (b.lead) {
       ctx.fillStyle = COLORS.gold;

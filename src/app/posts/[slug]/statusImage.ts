@@ -1,5 +1,5 @@
 import type { StatusCard } from "@/lib/status";
-import { BODY_TOP, COLORS, FOOT_TOP, PAD, SANS, SERIF, W, drawHeader, drawQrFooter, loadFonts, newCanvas, toBlob, wrap, type ImagePost } from "./imageCanvas";
+import { COLORS, FOOT_TOP, PAD, SANS, SERIF, W, drawHeader, drawQrFooter, loadFonts, newCanvas, toBlob, wrap, type ImagePost } from "./imageCanvas";
 
 // Draws status cards as 1080x1920 PNGs (WhatsApp status size) in the short post's design: the same header,
 // the card as a titled section with the gold side line, and on the last card the same QR footer.
@@ -39,12 +39,12 @@ function drawDots(ctx: CanvasRenderingContext2D, n: number, total: number) {
 
 async function draw(card: StatusCard, n: number, total: number, post: ImagePost): Promise<HTMLCanvasElement> {
   const [canvas, ctx] = newCanvas();
-  drawHeader(ctx, post, `הרעיון בקצרה · ${n} מתוך ${total}`);
+  const bodyTop = drawHeader(ctx, post, `הרעיון בקצרה · ${n} מתוך ${total}`);
 
   const right = W - PAD;
   const inset = 36;
-  const fit = layout(ctx, card, W - 2 * PAD - inset, FOOT_TOP - BODY_TOP - 120);
-  const top = BODY_TOP + (FOOT_TOP - BODY_TOP - fit.height) / 2 - 20;
+  const fit = layout(ctx, card, W - 2 * PAD - inset, FOOT_TOP - bodyTop - 120);
+  const top = bodyTop + (FOOT_TOP - bodyTop - fit.height) / 2 - 20;
   ctx.fillStyle = COLORS.gold;
   ctx.fillRect(right - 8, top, 8, fit.height);
   let y = top;

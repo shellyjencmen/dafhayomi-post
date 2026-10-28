@@ -16,7 +16,6 @@ export const COLORS = {
   line: "#e7e0d4",
   tint: "#f4ecdd",
 };
-export const BODY_TOP = 380;
 export const FOOT_TOP = 1584;
 
 export type ImagePost = { slug: string; title: string; meta: string };
@@ -51,7 +50,8 @@ export function newCanvas(): [HTMLCanvasElement, CanvasRenderingContext2D] {
 }
 
 // Site name, masechet and daf, the post title, and a gold line naming what this image is.
-export function drawHeader(ctx: CanvasRenderingContext2D, post: ImagePost, kind: string) {
+// A long title shrinks to fit two to four lines. Returns where the body starts.
+export function drawHeader(ctx: CanvasRenderingContext2D, post: ImagePost, kind: string): number {
   const right = W - PAD;
   ctx.fillStyle = COLORS.accent;
   ctx.font = `700 48px ${SERIF}`;
@@ -60,11 +60,23 @@ export function drawHeader(ctx: CanvasRenderingContext2D, post: ImagePost, kind:
   ctx.font = `400 30px ${SANS}`;
   ctx.fillText(post.meta, right, 146);
   ctx.fillStyle = COLORS.ink;
-  ctx.font = `700 84px ${SERIF}`;
-  ctx.fillText(wrap(ctx, post.title, W - 2 * PAD)[0] ?? "", right, 200);
+  let titleSize = 84;
+  let title: string[] = [];
+  for (const [size, maxLines] of [[84, 1], [64, 2], [52, 3], [44, 4]]) {
+    titleSize = size;
+    ctx.font = `700 ${size}px ${SERIF}`;
+    title = wrap(ctx, post.title, W - 2 * PAD);
+    if (title.length <= maxLines) break;
+  }
+  let titleY = 200;
+  for (const line of title) {
+    ctx.fillText(line, right, titleY);
+    titleY += titleSize * 1.15;
+  }
   ctx.fillStyle = COLORS.gold;
   ctx.font = `500 30px ${SANS}`;
-  ctx.fillText(kind, right, 312);
+  ctx.fillText(kind, right, titleY + 16);
+  return titleY + 84;
 }
 
 // The link to the full post as a QR code, since a link inside an image cannot be tapped.
