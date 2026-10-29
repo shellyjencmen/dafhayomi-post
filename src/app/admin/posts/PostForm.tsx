@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { publish, saveDraft, unpublish } from "./actions";
 import { BodyField } from "./BodyField";
+import { FormKeeper } from "./FormKeeper";
 import { formatDaf } from "@/lib/daf";
 import styles from "../admin.module.css";
 
@@ -33,6 +34,7 @@ export function PostForm({
       {message && <p className={styles.message} role="status">{message}</p>}
       {error && <p className={styles.error} role="alert">{error}</p>}
       <form>
+        <FormKeeper formKey={id ?? "new"} restore={!!error} clear={!!message} />
         <div className={styles.field}>
           <label htmlFor="masechet_id">מסכת</label>
           <select id="masechet_id" name="masechet_id" defaultValue={values.masechetId ?? ""} required>
