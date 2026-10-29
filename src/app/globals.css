@@ -49,6 +49,7 @@ a:hover {
   text-decoration: none;
   display: inline-flex;
   align-items: center;
+  gap: 10px;
   min-height: 44px;
 }
 
@@ -130,7 +131,7 @@ a:hover {
 }
 
 .gemara-page {
-  margin: 16px 0;
+  margin: 0;
 }
 
 .gemara-page img {
@@ -138,6 +139,8 @@ a:hover {
   height: auto;
   border-radius: 8px;
   border: 1px solid var(--line);
+  /* The scan's white paper takes the page's cream background. */
+  mix-blend-mode: multiply;
 }
 
 .button-link {
@@ -352,11 +355,6 @@ a:hover {
   }
 }
 
-.gemara-viewer {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
 
 .gemara-tabs {
   display: flex;
@@ -519,35 +517,250 @@ a:hover {
   margin-top: 20px;
 }
 
-.status-cards {
+/* Status, short post and Gemara share one box: same width, background and title inside. */
+.status-cards,
+.short-post,
+.gemara-viewer {
   margin: 24px 0;
+  background: var(--ground);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 20px 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
-.status-title {
-  font-size: 1.1rem;
-  margin: 0 0 12px;
-}
-.status-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
+.status-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
   gap: 12px;
 }
+.status-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--gold);
+}
+.status-count {
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+.status-stack {
+  display: grid;
+}
 .status-card {
-  background: #f4ecdd;
-  border-right: 4px solid #a87b2a;
-  border-radius: 14px;
-  padding: 16px 18px;
+  grid-area: 1 / 1;
+  visibility: hidden;
+  min-height: 104px;
+  border-right: 4px solid var(--gold);
+  padding-right: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
 }
 .status-card-title {
-  margin: 0 0 6px;
-  font-family: "Frank Ruhl Libre", serif;
-  font-size: 1.3rem;
-  line-height: 1.25;
+  margin: 0;
+  color: var(--accent);
+  font-family: var(--serif);
+  font-size: 1.375rem;
+  line-height: 1.4;
 }
 .status-card p {
   margin: 0;
-  font-family: "Frank Ruhl Libre", serif;
-  font-size: 1.1rem;
-  line-height: 1.75;
+  font-family: var(--serif);
+  font-size: 1.375rem;
+  line-height: 1.7;
+}
+.status-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+.status-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--line);
+}
+.status-dots span.active {
+  background: var(--gold);
+}
+.status-nav {
+  display: flex;
+  gap: 8px;
+}
+.status-nav button {
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid var(--field);
+  background: #fff;
+  color: var(--ink);
+  font: 700 0.95rem "Heebo", sans-serif;
+  cursor: pointer;
+}
+.status-nav button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.status-card.active {
+  visibility: visible;
+}
+.status-download {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  font-size: 0.9rem;
+}
+.status-download button {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: 700 0.9rem "Heebo", sans-serif;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.status-download button:disabled {
+  opacity: 0.5;
+  cursor: progress;
+}
+.status-more {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.jump {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.jump-lead {
+  margin: 0;
+  font-size: 0.9rem;
+}
+.jump-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.jump-item {
+  display: flex;
+  flex-direction: column;
+  min-height: 44px;
+  padding: 10px 14px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--ink);
+  text-decoration: none;
+  line-height: 1.4;
+}
+.jump-item span {
+  font-size: 0.8rem;
+}
+.post-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "main" "side" "rest";
+  gap: 32px;
+}
+.post-main {
+  grid-area: main;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.post-side {
+  grid-area: side;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.post-side .status-cards,
+.post-side .short-post,
+.post-side .gemara-viewer {
+  margin: 0;
+}
+.post-comments-link {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 700;
+}
+.post-rest {
+  grid-area: rest;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.side-previous {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.side-previous .card {
+  padding: 14px 16px;
+  gap: 4px;
+}
+.side-previous .card-title {
+  font-size: 18px;
+}
+.home-side .status-cards {
+  margin: 0;
+}
+.post-toggle {
+  border: 0;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.post-more:not(.open) {
+  display: none;
+}
+@media (min-width: 900px) {
+  .mobile-only {
+    display: none !important;
+  }
+  .jump-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .post-layout {
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+    grid-template-areas: "main side" "rest side";
+    column-gap: 56px;
+    align-items: start;
+  }
+}
+
+.short-post-frame {
+  aspect-ratio: 1080 / 1920;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  width: 100%;
+}
+.short-post-frame a {
+  display: block;
+  height: 100%;
+}
+.short-post-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
