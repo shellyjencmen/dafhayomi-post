@@ -1,10 +1,18 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+
+// Sent by "read the full post" in the status box, which lives in the side column.
+export const OPEN_POST_EVENT = "post:open";
 
 // The post folds after the opening paragraphs, on every screen width, so the side column never moves.
 export function PostBody({ intro, rest, restMinutes }: { intro: ReactNode; rest: ReactNode; restMinutes: number }) {
   const [open, setOpen] = useState(false);
+  useEffect(() => {
+    const openPost = () => setOpen(true);
+    window.addEventListener(OPEN_POST_EVENT, openPost);
+    return () => window.removeEventListener(OPEN_POST_EVENT, openPost);
+  }, []);
   if (!rest) return <div className="post-body">{intro}</div>;
 
   function toggle() {

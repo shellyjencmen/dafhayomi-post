@@ -2,6 +2,7 @@ import { formatDaf } from "@/lib/daf";
 import { masechetName } from "@/lib/posts";
 import Link from "next/link";
 import { adminClient } from "@/lib/supabase";
+import { CHANNEL_LABEL, reportChannel } from "@/lib/views";
 import { sessionClient } from "@/lib/supabase-server";
 import { loadStatusSummaries } from "@/lib/status-admin";
 import { CONTENT_LABEL, WHATSAPP_LABEL, type StatusSummary } from "@/lib/status-state";
@@ -10,7 +11,6 @@ import styles from "../admin.module.css";
 export const dynamic = "force-dynamic";
 
 const STATE_LABEL: Record<string, string> = { draft: "טיוטה", published: "פורסם", unpublished: "הוסר" };
-const CHANNEL_LABEL: Record<string, string> = { direct: "ישיר", whatsapp: "וואטסאפ", teaser: "פוסט מקוצר", status: "סטטוס", email: "מייל" };
 
 type Row = {
   id: string;
@@ -44,7 +44,8 @@ export default async function PostsPage({ searchParams }: { searchParams: Promis
   const viewsByChannel = new Map<string, number>();
   for (const v of (viewRows ?? []) as { post_id: string; channel: string }[]) {
     viewsByPost.set(v.post_id, (viewsByPost.get(v.post_id) ?? 0) + 1);
-    viewsByChannel.set(v.channel, (viewsByChannel.get(v.channel) ?? 0) + 1);
+    const channel = reportChannel(v.channel);
+    viewsByChannel.set(channel, (viewsByChannel.get(channel) ?? 0) + 1);
   }
   const totalViews = [...viewsByPost.values()].reduce((a, b) => a + b, 0);
   const published = rows.filter((p) => p.publish_state === "published").length;

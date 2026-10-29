@@ -48,8 +48,13 @@ export function ShortPost({ cards, post }: { cards: StatusCard[]; post: ShortPos
     <section id="short" className="short-post" aria-label="הפוסט בקצרה">
       <h2 className="status-title">הפוסט בקצרה, בתמונה אחת</h2>
       <div className="short-post-frame">
-        {/* eslint-disable-next-line @next/next/no-img-element -- drawn in the browser as a blob URL */}
-        {src ? <img src={src} alt="" width={1080} height={1920} /> : null}
+        {src ? (
+          // A tap opens the image at full size, where the phone can zoom in.
+          <a href={src} target="_blank" rel="noreferrer" aria-label="פתיחת התמונה בגודל מלא">
+            {/* eslint-disable-next-line @next/next/no-img-element -- drawn in the browser as a blob URL */}
+            <img src={src} alt="" width={1080} height={1920} />
+          </a>
+        ) : null}
       </div>
       <div className="sr-only">
         {cards.map((c, i) => (

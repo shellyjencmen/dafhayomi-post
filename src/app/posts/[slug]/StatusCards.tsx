@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { StatusCard } from "@/lib/status";
 import { downloadStatusImages } from "./statusImage";
 import type { ImagePost } from "./imageCanvas";
+import { OPEN_POST_EVENT } from "./PostBody";
 
 // postHref: where "read the full post" goes; omitted on the post page itself (jumps to the top).
 // All cards are stacked in one grid cell so the box keeps the height of the tallest card.
@@ -38,6 +39,11 @@ export function StatusCards({ cards, post, postHref }: { cards: StatusCard[]; po
           </div>
         ))}
       </div>
+      <div className="status-dots" aria-hidden="true">
+        {cards.map((_, i) => (
+          <span key={i} className={i === index ? "active" : ""} />
+        ))}
+      </div>
       <div className="status-nav">
         <button type="button" onClick={() => setIndex(index - 1)} disabled={index === 0}>
           › הקודם
@@ -60,7 +66,7 @@ export function StatusCards({ cards, post, postHref }: { cards: StatusCard[]; po
           לקריאת הפוסט המלא ‹
         </Link>
       ) : (
-        <a className="status-more" href="#post-top">
+        <a className="status-more" href="#post-top" onClick={() => window.dispatchEvent(new Event(OPEN_POST_EVENT))}>
           לקריאת הפוסט המלא ‹
         </a>
       )}
