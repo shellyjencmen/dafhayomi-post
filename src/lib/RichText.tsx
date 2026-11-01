@@ -1,12 +1,11 @@
 import type { ReactNode } from "react";
+import { INLINE } from "./inline";
 
 /**
  * Post bodies keep the original formatting as light markup:
- * **bold**, *italic*, [text](https://link), a new line for a line break, a blank line between paragraphs.
+ * **bold**, *italic*, ***bold italic***, [text](https://link), a new line for a line break, a blank line between paragraphs.
  * Rendered as React nodes only, never as raw HTML.
  */
-const INLINE = /\[([^\]\n]+)\]\((https?:\/\/[^\s)]+)\)|\*\*(.+?)\*\*|\*(.+?)\*/;
-
 function inline(text: string, keyPrefix: string): ReactNode[] {
   const out: ReactNode[] = [];
   let rest = text;
