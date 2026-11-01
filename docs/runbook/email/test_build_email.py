@@ -4,7 +4,7 @@ import sys
 import unittest
 
 sys.path.insert(0, os.path.dirname(__file__))
-from build_email import build, format_daf, subject  # noqa: E402
+from build_email import build, format_daf, inline_html, subject  # noqa: E402
 
 POST = {
     "slug": "qa-email-test",
@@ -57,6 +57,10 @@ class BuildEmailTest(unittest.TestCase):
 
     def test_no_images(self):
         self.assertNotIn("<img", self.email["html"])
+
+    def test_bold_italic_has_no_stray_asterisks(self):
+        self.assertEqual(inline_html("ו***מודגש ונטוי***."), "ו<b><i>מודגש ונטוי</i></b>.")
+        self.assertEqual(inline_html("**א** **ב**"), "<b>א</b> <b>ב</b>")
 
 
 if __name__ == "__main__":
