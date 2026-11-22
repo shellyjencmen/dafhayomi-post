@@ -9,7 +9,7 @@ export default async function NewPostPage({ searchParams }: { searchParams: Prom
   const { data: masechtot } = await supabase.from("masechtot").select("id, name").order("sort_order");
   return (
     <PostForm
-      values={{ id: null, masechetId: null, daf: null, title: "", body: "", summary: "", state: "draft", slug: null }}
+      values={{ id: null, masechetId: null, daf: null, title: "", body: "", summary: "", videoUrl: "", state: "draft", slug: null }}
       masechtot={masechtot ?? []}
       error={error}
     />
