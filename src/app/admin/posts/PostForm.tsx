@@ -12,6 +12,7 @@ export type FormValues = {
   title: string;
   body: string;
   summary: string;
+  videoUrl: string;
   state: string;
   slug: string | null;
 };
@@ -59,6 +60,10 @@ export function PostForm({
         <div className={styles.field}>
           <label htmlFor="summary">תקציר (לא חובה)</label>
           <input id="summary" name="summary" maxLength={500} defaultValue={values.summary} />
+        </div>
+        <div className={styles.field}>
+          <label htmlFor="video_url">קישור לווידאו (לא חובה, סרטון אחד; קישור יוטיוב יוצג כנגן בעמוד, קישור אחר ככפתור)</label>
+          <input id="video_url" name="video_url" type="url" inputMode="url" dir="ltr" maxLength={500} placeholder="https://www.youtube.com/watch?v=..." defaultValue={values.videoUrl} />
         </div>
         <div className={styles.field}>
           <label htmlFor="body">גוף הפוסט (עד 60,000 תווים, שורה ריקה בין פסקאות; הדבקה מגוגל דוקס שומרת הדגשות)</label>

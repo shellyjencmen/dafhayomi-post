@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { RichParagraph } from "@/lib/RichText";
 import { sessionClient } from "@/lib/supabase-server";
+import { PostVideo } from "@/app/posts/[slug]/PostVideo";
 import styles from "../../../admin.module.css";
 
 export const dynamic = "force-dynamic";
@@ -11,7 +12,7 @@ export default async function PreviewPage({ params }: { params: Promise<{ id: st
   const supabase = await sessionClient();
   const { data: latest } = await supabase
     .from("post_versions")
-    .select("title, body")
+    .select("title, body, video_url")
     .eq("post_id", id)
     .order("version_no", { ascending: false })
     .limit(1)
@@ -31,6 +32,7 @@ export default async function PreviewPage({ params }: { params: Promise<{ id: st
       {paragraphs.map((text, i) => (
         <RichParagraph key={i} text={text} />
       ))}
+      {latest.video_url ? <PostVideo url={latest.video_url} title={latest.title} /> : null}
       {(pages ?? []).map((page: { id: string; label: string | null; alt_text: string | null; image_path: string }) => (
         <figure key={page.id}>
           {/* eslint-disable-next-line @next/next/no-img-element */}

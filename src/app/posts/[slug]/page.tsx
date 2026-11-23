@@ -10,6 +10,7 @@ import { RichParagraph } from "@/lib/RichText";
 import { recordView } from "@/lib/views";
 import { Comments } from "./Comments";
 import { PostBody } from "./PostBody";
+import { PostVideo } from "./PostVideo";
 import { Shortcuts } from "@/app/Shortcuts";
 import { loadShortPost, loadStatusCards } from "@/lib/status";
 
@@ -30,7 +31,7 @@ async function loadPost(slug: string) {
   const [{ data: version }, { data: pages }, previous] = await Promise.all([
     db
       .from("post_versions")
-      .select("title, body, summary")
+      .select("title, body, summary, video_url")
       .eq("id", post.current_version_id)
       .maybeSingle(),
     db
@@ -127,6 +128,7 @@ export default async function PostPage({
   const intro = paragraphs.slice(0, 2);
   const rest = paragraphs.slice(2);
   const shortcuts = [
+    ...(version.video_url ? [{ href: "#video", title: "הווידאו", sub: "צפייה" }] : []),
     ...(statusCards.length ? [{ href: "#status", title: "הרעיון בקצרה", sub: `${statusCards.length} כרטיסים · דקה` }] : []),
     ...(shortPost.length ? [{ href: "#short", title: "הפוסט בקצרה", sub: "בתמונה אחת" }] : []),
     ...(images.length ? [{ href: "#gemara", title: "דפי הגמרא", sub: "המקור לעיון" }] : []),
@@ -167,6 +169,7 @@ export default async function PostPage({
             }
             restMinutes={readingMinutes(rest.join(" "))}
           />
+          {version.video_url ? <PostVideo url={version.video_url} title={version.title} /> : null}
           <Shortcuts items={shortcuts} />
         </article>
         <PostSide
