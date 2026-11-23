@@ -5,9 +5,13 @@ const LETTERS: [string, number][] = [
 
 const FINAL_FORMS: Record<string, string> = { ך: "כ", ם: "מ", ן: "נ", ף: "פ", ץ: "צ" };
 
-// Accepts digits ("12") or Hebrew letters ("יב", "קכ", "י״ב"). Returns null when invalid.
+// Accepts digits ("12") or Hebrew letters ("יב", "קכ", "י״ב"), also with the word "דף" ("דף מא"). Returns null when invalid.
 export function parseDaf(input: string): number | null {
-  const text = input.trim().replace(/[׳״"'׳״]/g, "");
+  const text = input
+    .trim()
+    .replace(/^דף[\s:]+/, "")
+    .replace(/\s+/g, "")
+    .replace(/[׳״"'׳״]/g, "");
   if (/^\d+$/.test(text)) {
     const n = Number(text);
     return n >= 1 && n <= 999 ? n : null;

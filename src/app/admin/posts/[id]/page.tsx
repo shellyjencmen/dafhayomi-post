@@ -23,7 +23,7 @@ export default async function EditPostPage({
   if (!post) notFound();
   const { data: latest } = await supabase
     .from("post_versions")
-    .select("title, body, summary")
+    .select("title, body, summary, video_url")
     .eq("post_id", id)
     .order("version_no", { ascending: false })
     .limit(1)
@@ -51,6 +51,7 @@ export default async function EditPostPage({
         title: latest?.title ?? "",
         body: latest?.body ?? "",
         summary: latest?.summary ?? "",
+        videoUrl: latest?.video_url ?? "",
         state: post.publish_state,
         slug: post.slug,
       }}

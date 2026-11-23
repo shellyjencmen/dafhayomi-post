@@ -1,9 +1,12 @@
 import Link from "next/link";
-import { GemaraViewer } from "./GemaraViewer";
 import { formatDaf } from "@/lib/daf";
-import { masechetName, paragraphsOf, readingMinutes, formatPublishedOn } from "@/lib/posts";
+import { masechetName, paragraphsOf, readingMinutes, formatPublishedOn, shortPostMeta } from "@/lib/posts";
 import { RichParagraph } from "@/lib/RichText";
+import { loadShortPost, loadStatusCards } from "@/lib/status";
 import { publicClient } from "@/lib/supabase";
+import { PostBody } from "./posts/[slug]/PostBody";
+import { PostSide } from "./PostSide";
+import { Shortcuts } from "./Shortcuts";
 
 export const dynamic = "force-dynamic";
 
@@ -48,27 +51,50 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
     );
   }
 
-  const [{ data: versions }, { data: pages }] = await Promise.all([
+  const [{ data: versions }, { data: pages }, statusCards, shortPost] = await Promise.all([
     db.from("post_versions").select("id, title, body").in("id", rows.map((p) => p.current_version_id)),
     db.from("gemara_pages").select("id, label, alt_text, image_path").eq("post_id", latest.id).order("sort"),
+    loadStatusCards(db, latest.id),
+    loadShortPost(db, latest.id),
   ]);
   const byId = new Map((versions ?? []).map((v: { id: string; title: string; body: string }) => [v.id, v]));
   const main = byId.get(latest.current_version_id);
-  const allParagraphs = main ? paragraphsOf(main.body) : [];
-  const intro = allParagraphs.slice(0, 2);
-  const truncated = allParagraphs.length > intro.length;
+  const title = main?.title ?? "";
+  const paragraphs = main ? paragraphsOf(main.body) : [];
+  const intro = paragraphs.slice(0, 2);
+  const rest = paragraphs.slice(2);
+  const postHref = `/posts/${latest.slug}${channel}`;
   const imageBase = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${GEMARA_BUCKET}`;
-  const gemara = (pages ?? []) as GemaraRow[];
+  const images = ((pages ?? []) as GemaraRow[]).map((page) => ({
+    id: page.id,
+    url: `${imageBase}/${page.image_path}`,
+    label: page.label,
+    alt: page.alt_text,
+  }));
+  const previousPosts = previous.map((p) => ({
+    slug: p.slug,
+    daf: p.daf,
+    publishedOn: p.published_on,
+    masechtot: p.masechtot,
+    title: byId.get(p.current_version_id)?.title ?? "",
+  }));
+  const shortcuts = [
+    ...(statusCards.length ? [{ href: "#status", title: "הרעיון בקצרה", sub: `${statusCards.length} כרטיסים · דקה` }] : []),
+    ...(shortPost.length ? [{ href: "#short", title: "הפוסט בקצרה", sub: "בתמונה אחת" }] : []),
+    ...(images.length ? [{ href: "#gemara", title: "דפי הגמרא", sub: "המקור לעיון" }] : []),
+    ...(previous.length ? [{ href: "#previous", title: "פוסטים קודמים", sub: "וכל הארכיון" }] : []),
+  ];
 
+  // Same layout as the post page, so opening the full post moves nothing.
   return (
     <main className="home">
-      <div className="home-grid">
-        <section className="home-post">
+      <div className="post-layout">
+        <section className="post-main">
           <div className="home-meta">
             <span className="pill">{tag(latest)}</span>
             <span className="muted">הפוסט של השבוע</span>
           </div>
-          <h1 className="post-title">{main?.title}</h1>
+          <h1 id="post-top" className="post-title">{title}</h1>
           <div className="byline">
             <span className="avatar" aria-hidden="true">
               א
@@ -81,45 +107,26 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ s
               </span>
             </span>
           </div>
-          <div className={truncated ? "post-body fade" : "post-body"}>
-            {intro.map((text, i) => (
+          <PostBody
+            intro={intro.map((text, i) => (
               <RichParagraph key={i} text={text} />
             ))}
-          </div>
-          <Link className="button-link wide" href={`/posts/${latest.slug}${channel}`}>
-            להמשך הקריאה ולתגובות
+            rest={rest.length ? rest.map((text, i) => <RichParagraph key={i} text={text} />) : null}
+            restMinutes={readingMinutes(rest.join(" "))}
+          />
+          <Link className="post-comments-link" href={`${postHref}#comments`}>
+            לתגובות ולשיתוף ‹
           </Link>
+          <Shortcuts items={shortcuts} />
         </section>
-        {gemara.length ? (
-          <aside className="home-side">
-            <GemaraViewer
-              images={gemara.map((page) => ({
-                id: page.id,
-                url: `${imageBase}/${page.image_path}`,
-                label: page.label,
-                alt: page.alt_text,
-              }))}
-            />
-          </aside>
-        ) : null}
+        <PostSide
+          post={{ slug: latest.slug, title, meta: shortPostMeta(latest.masechtot, latest.daf) }}
+          statusCards={statusCards}
+          shortPost={shortPost}
+          images={images}
+          previous={previousPosts}
+        />
       </div>
-      {previous.length ? (
-        <section className="home-previous">
-          <div className="row-between">
-            <h2>פוסטים קודמים</h2>
-            <Link href="/archive">לכל הארכיון</Link>
-          </div>
-          <div className="cards">
-            {previous.map((p) => (
-              <Link key={p.id} className="card" href={`/posts/${p.slug}`}>
-                <span className="pill">{tag(p)}</span>
-                <span className="card-title">{byId.get(p.current_version_id)?.title}</span>
-                <span className="muted">{formatPublishedOn(p.published_on)}</span>
-              </Link>
-            ))}
-          </div>
-        </section>
-      ) : null}
     </main>
   );
 }

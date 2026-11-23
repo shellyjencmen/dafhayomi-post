@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { publish, saveDraft, unpublish } from "./actions";
 import { BodyField } from "./BodyField";
+import { FormKeeper } from "./FormKeeper";
 import { formatDaf } from "@/lib/daf";
 import styles from "../admin.module.css";
 
@@ -11,6 +12,7 @@ export type FormValues = {
   title: string;
   body: string;
   summary: string;
+  videoUrl: string;
   state: string;
   slug: string | null;
 };
@@ -33,6 +35,7 @@ export function PostForm({
       {message && <p className={styles.message} role="status">{message}</p>}
       {error && <p className={styles.error} role="alert">{error}</p>}
       <form>
+        <FormKeeper formKey={id ?? "new"} restore={!!error} clear={!!message} />
         <div className={styles.field}>
           <label htmlFor="masechet_id">מסכת</label>
           <select id="masechet_id" name="masechet_id" defaultValue={values.masechetId ?? ""} required>
@@ -57,6 +60,10 @@ export function PostForm({
         <div className={styles.field}>
           <label htmlFor="summary">תקציר (לא חובה)</label>
           <input id="summary" name="summary" maxLength={500} defaultValue={values.summary} />
+        </div>
+        <div className={styles.field}>
+          <label htmlFor="video_url">קישור לווידאו (לא חובה, סרטון אחד; קישור יוטיוב יוצג כנגן בעמוד, קישור אחר ככפתור)</label>
+          <input id="video_url" name="video_url" type="url" inputMode="url" dir="ltr" maxLength={500} placeholder="https://www.youtube.com/watch?v=..." defaultValue={values.videoUrl} />
         </div>
         <div className={styles.field}>
           <label htmlFor="body">גוף הפוסט (עד 60,000 תווים, שורה ריקה בין פסקאות; הדבקה מגוגל דוקס שומרת הדגשות)</label>

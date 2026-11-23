@@ -1,10 +1,10 @@
 import { formatDaf } from "@/lib/daf";
 import { adminClient } from "@/lib/supabase";
+import { CHANNEL_LABEL, reportChannel } from "@/lib/views";
 import styles from "../admin.module.css";
 
 export const dynamic = "force-dynamic";
 
-const CHANNEL_LABEL: Record<string, string> = { direct: "ישיר", whatsapp: "וואטסאפ", teaser: "פוסט מקוצר", status: "סטטוס", email: "מייל" };
 
 type View = { post_id: string; channel: string };
 type Post = { id: string; slug: string; daf: number | null; masechtot: { name: string } | { name: string }[] | null };
@@ -21,7 +21,8 @@ export default async function ReportsPage() {
   const rows = (views ?? []) as View[];
   const byPost = new Map<string, Map<string, number>>();
   const byChannel = new Map<string, number>();
-  for (const v of rows) {
+  for (const { post_id, channel } of rows) {
+    const v = { post_id, channel: reportChannel(channel) };
     const channels = byPost.get(v.post_id) ?? new Map<string, number>();
     channels.set(v.channel, (channels.get(v.channel) ?? 0) + 1);
     byPost.set(v.post_id, channels);

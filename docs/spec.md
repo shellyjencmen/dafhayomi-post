@@ -10,9 +10,12 @@ Full solution concept: docs/solution.md. MVP1 scope: public site, post managemen
 - Owners: Avi, and Shelly as the vendor. The usage report shows published and pending comment counts.
 - Data: table `comments` (migration 0005). Readers can select only `approved` comments of published posts; inserts happen on the server with the secret key.
 
-## Deliverables and approvals (MVP4 data model, migration 0006)
-- A deliverable (status now; email and short post later) belongs to a post and to one `post_version_id`. A status has exactly two alternatives (`a`, `b`), each a list of cards taken from the post.
-- An approval is saved with the `post_version_id` it was given for. It is valid only while it is not revoked and that id equals the post's current version. Nothing is stored as "needs review": it is derived, so a new version of the post makes every earlier approval invalid at once (rules 3 and 4 in docs/solution.md 6.4).
-- Editing a card after approval revokes the approval (`revoked_at`). History stays.
-- Readers can read an alternative only when it has a valid approval for the current version of a published post. Drafts, unapproved alternatives, approvals and shares are visible to owners only.
-- "Shared" is one row per deliverable, so a second press adds nothing.
+## Deliverables and approvals (MVP4, migrations 0006 to 0008; PRD v0.6 section 3.7)
+- A deliverable (status now; email and short post later) belongs to a post and to one `post_version_id`. A status has exactly two alternatives (`a` follows the post's order, `b` opens with the conclusion), each with 3 to 6 cards.
+- A card is `{ phase, title, text, options }`: phase is opening, middle or closing; `options` are other suggested wordings. The owner fixes a card only by picking a suggested wording, moving it or deleting it. No free typing.
+- Cards summarize the idea; they are not word-for-word quotes. The POC prepares them by simple rules (free). A language model (Claude API) is an option behind the same interface, off by default (`STATUS_METHOD`).
+- Two approvals, both by an owner: **content** approval, then **action** approval (show on the site). Content approval alone shows and shares nothing.
+- Every approval stores the `post_version_id`, the alternative, the owner, the time, the targets and a signature of the cards it approved (`content_hash`, md5 of the cards JSON). It is valid only while it is not revoked, its version is the post's current version, and the signature matches the cards. So a new post version or any change to the cards voids it at once, and the site hides the status until a new action approval. "Needs review" is derived, not stored.
+- A double press on "approve" adds nothing (one live approval per alternative, version, stage and signature).
+- Readers can read an alternative only with a valid action approval for the current version of a published post. Drafts, alternatives, content approvals, approvals and shares are visible to owners only.
+- State per target: site = shown while a valid action approval exists; WhatsApp = "shared" mark, one row per deliverable, so a second press adds nothing. What was already shared stays shared after a change; the owner decides whether to share again.

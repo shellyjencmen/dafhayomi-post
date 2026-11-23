@@ -1,6 +1,7 @@
 "use server";
 
 import { parseDaf } from "@/lib/daf";
+import { normalizeVideoUrl } from "@/lib/video";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { adminClient } from "@/lib/supabase";
@@ -16,6 +17,7 @@ type Fields = {
   title: string;
   body: string;
   summary: string | null;
+  videoUrl: string | null;
 };
 
 function back(id: string | null, key: "error" | "msg", text: string): never {
@@ -36,7 +38,9 @@ function readFields(formData: FormData, id: string | null): Fields {
   if (!body.trim()) back(id, "error", "יש להזין את גוף הפוסט.");
   if (body.length > MAX_BODY) back(id, "error", "גוף הפוסט ארוך מדי.");
   if (summary && summary.length > MAX_SUMMARY) back(id, "error", `התקציר ארוך מדי (עד ${MAX_SUMMARY} תווים).`);
-  return { masechetId, daf, title, body, summary };
+  const video = normalizeVideoUrl(String(formData.get("video_url") ?? ""));
+  if (!video.ok) back(id, "error", "קישור הווידאו לא תקין. יש להדביק קישור מלא שמתחיל ב-https://");
+  return { masechetId, daf, title, body, summary, videoUrl: video.ok ? video.url : null };
 }
 
 /**
@@ -74,7 +78,7 @@ async function saveVersion(id: string | null, f: Fields) {
     .limit(1)
     .maybeSingle();
 
-  const content = { title: f.title, body: f.body, summary: f.summary };
+  const content = { title: f.title, body: f.body, summary: f.summary, video_url: f.videoUrl };
   let versionId: string;
   if (latest && latest.id !== post?.current_version_id) {
     const { error } = await supabase.from("post_versions").update(content).eq("id", latest.id);

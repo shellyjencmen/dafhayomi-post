@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+const LETTERS = "אבגדהוזחטיכלמנסעפצקרשת";
+
 export type GemaraImageView = { id: string; url: string; label: string | null; alt: string | null };
 
 export function GemaraViewer({ images }: { images: GemaraImageView[] }) {
@@ -10,9 +12,9 @@ export function GemaraViewer({ images }: { images: GemaraImageView[] }) {
   if (!current) return null;
   return (
     <div className="gemara-viewer">
-      <div className="side-title">
-        <strong>דף הגמרא לעיון</strong>
-        <span className="muted">רפרנס לטקסט</span>
+      <div className="status-head">
+        <h2 className="status-title">דף הגמרא לעיון</h2>
+        <span className="status-count muted">רפרנס לטקסט</span>
       </div>
       {images.length > 1 ? (
         <div className="gemara-tabs" role="tablist" aria-label="עמודי הגמרא">
@@ -25,7 +27,7 @@ export function GemaraViewer({ images }: { images: GemaraImageView[] }) {
               className={i === active ? "chip chip-on" : "chip"}
               onClick={() => setActive(i)}
             >
-              {image.label || `עמוד ${i + 1}`}
+              {`דף ${LETTERS[i] ?? i + 1}'`}
             </button>
           ))}
         </div>
